@@ -58,7 +58,15 @@ button_card_templates:
         - line-height: 1
         - padding-top: 4px
   custom_card_room_sensor:
-    template: setup
+    triggers_update:
+      - '[[[ return variables.target_temp_entity ]]]'
+      - '[[[ return variables.light_entity ]]]'
+      - '[[[ return variables.temp_entity ]]]'
+      - '[[[ return variables.humidity_entity ]]]'
+      - '[[[ return variables.co2_entity ]]]'
+    show_icon: true
+    show_name: true
+    show_state: false
     variables:
       room_name: ''
       temp_entity: ''
@@ -66,32 +74,18 @@ button_card_templates:
       co2_entity: ''
       radius: 24px
       icon: mdi:thermometer
+      light_entity: ''
+      target_temp_entity: ''
     entity: '[[[ return variables.temp_entity ]]]'
-    name: |
-      [[[
-        if (variables.co2_entity && variables.co2_entity !== "") {
-          var co2State = states[variables.co2_entity];
-          var co2Value;
-
-          if (co2State && co2State.state !== 'unavailable' && co2State.state !== 'unknown') {
-            co2Value = parseFloat(co2State.state);
-          } else {
-            // Generate random CO2 value between 400-1200 ppm for testing
-            co2Value = Math.floor(Math.random() * 800) + 400;
-          }
-
-          return `${co2Value} ppm`;
-        }
-        return "";
-      ]]]
     icon: '[[[ return variables.icon ]]]'
-    show_label: true
+    name: '[[[ return variables.room_name ]]]'
     label: |
       [[[
+        var parts = [];
+
+        // Temperature
         var tempEntity = states[variables.temp_entity];
         var temp;
-
-        // Handle climate entities (use current_temperature attribute) vs sensor entities (use state)
         if (tempEntity) {
           if (variables.temp_entity.startsWith('climate.')) {
             temp = tempEntity.attributes.current_temperature;
@@ -99,69 +93,167 @@ button_card_templates:
             temp = tempEntity.state;
           }
         }
+        if (!tempEntity || temp === undefined || temp === null || temp === 'unavailable' || temp === 'unknown') {
+          temp = (Math.random() * 6 + 18).toFixed(1);
+        }
+        parts.push(`${parseFloat(temp).toFixed(1).replace(".", ",")} °C`);
 
-        // Handle humidity with random fallback
-        var humState = variables.humidity_entity ? states[variables.humidity_entity] : null;
-        var humValue;
-        if (humState && humState.state !== 'unavailable' && humState.state !== 'unknown') {
-          humValue = parseFloat(humState.state);
-        } else {
-          // Generate random humidity value between 30-70% for testing
-          humValue = Math.floor(Math.random() * 40) + 30;
+        // Humidity
+        if (variables.humidity_entity) {
+          var humState = states[variables.humidity_entity];
+          var humValue;
+          if (humState && humState.state !== 'unavailable' && humState.state !== 'unknown') {
+            humValue = parseFloat(humState.state);
+          } else {
+            humValue = Math.floor(Math.random() * 40) + 30;
+          }
+          parts.push(`${humValue.toFixed(0)}%`);
         }
 
-        return `${parseFloat(temp).toFixed(0)}°<span style="font-size: 0.5em;opacity:0.7">${humValue.toFixed(0)}%</span>`;
+        // CO2
+        if (variables.co2_entity) {
+          var co2State = states[variables.co2_entity];
+          var co2Value;
+          if (co2State && co2State.state !== 'unavailable' && co2State.state !== 'unknown') {
+            co2Value = parseFloat(co2State.state);
+          } else {
+            co2Value = Math.floor(Math.random() * 800) + 400;
+          }
+          parts.push(`${co2Value} ppm`);
+        }
+
+        return parts.join(' • ');
       ]]]
+    show_label: true
     custom_fields:
-      room_label: '[[[ return variables.room_name ]]]'
+      controls:
+        card:
+          type: horizontal-stack
+          cards:
+            - type: custom:button-card
+              entity: '[[[ return variables.light_entity || "" ]]]'
+              show_name: false
+              show_state: false
+              icon: mdi:lightbulb
+              styles:
+                card:
+                  - display: '[[[ return variables.light_entity ? "block" : "none" ]]]'
+                  - background: transparent
+                  - border-radius: 12px
+                  - width: 32px
+                  - height: 32px
+                  - box-shadow: none
+                icon:
+                  - color: var(--contrast20)
+                  - width: 18px
+              tap_action:
+                action: '[[[ return variables.light_entity ? "toggle" : "none" ]]]'
+            - type: custom:button-card
+              entity: '[[[ return variables.target_temp_entity || "" ]]]'
+              icon: mdi:minus
+              show_name: false
+              show_state: false
+              styles:
+                card:
+                  - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
+                  - background: transparent
+                  - box-shadow: none
+                  - width: 32px
+                  - height: 32px
+                  - border-radius: 12px
+                icon:
+                  - color: var(--contrast20)
+                  - width: 18px
+              tap_action:
+                action: perform-action
+                perform_action: input_number.decrement
+                target:
+                  entity_id: '[[[ return variables.target_temp_entity ]]]'
+            - type: custom:button-card
+              entity: '[[[ return variables.target_temp_entity || "sensor.time" ]]]'
+              show_icon: false
+              show_name: false
+              show_state: true
+              state_display: '[[[ return variables.target_temp_entity && states[variables.target_temp_entity] && states[variables.target_temp_entity].state ? parseFloat(states[variables.target_temp_entity].state).toFixed(1).replace(".", ",") : "" ]]]'
+              styles:
+                card:
+                  - display: '[[[ return variables.target_temp_entity ? "flex" : "none" ]]]'
+                  - background: none
+                  - box-shadow: none
+                  - width: 30px
+                  - height: 32px
+                  - align-items: center
+                  - justify-content: center
+                state:
+                  - font-size: 14px
+                  - font-weight: 500
+                  - color: var(--contrast20)
+              tap_action:
+                action: none
+            - type: custom:button-card
+              entity: '[[[ return variables.target_temp_entity || "" ]]]'
+              icon: mdi:plus
+              show_name: false
+              show_state: false
+              styles:
+                card:
+                  - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
+                  - background: transparent
+                  - box-shadow: none
+                  - width: 32px
+                  - height: 32px
+                  - border-radius: 12px
+                icon:
+                  - color: var(--contrast20)
+                  - width: 18px
+              tap_action:
+                action: perform-action
+                perform_action: input_number.increment
+                target:
+                  entity_id: '[[[ return variables.target_temp_entity ]]]'
     styles:
       grid:
-        - grid-template-columns: 62px 1fr
-        - grid-template-areas: '"i l" "i n" "room_label room_label"'
-        - grid-template-rows: auto auto auto
+        - grid-template-columns: 50px 1fr min-content
+        - grid-template-areas: '"i n controls" "i l controls"'
+        - grid-template-rows: auto auto
         - align-content: center
         - gap: 2px
       icon:
         - width: 24px
-        - color: var(--contrast20)
+        - color: '#6f6f6f'
       img_cell:
         - justify-self: start
-        - width: 45px
-        - height: 45px
-        - background: var(--contrast1)
+        - width: 36px
+        - height: 36px
+        - background: '#242529'
         - border-radius: 50%
-        - margin-left: 7px
+        - margin-left: 10px
         - align-self: center
-      label:
+      name:
         - justify-self: start
-        - font-size: 20px
+        - font-size: 14px
+        - color: var(--primary-text-color)
         - font-weight: 500
-        - color: var(--contrast20)
         - align-self: end
         - line-height: 1
+        - margin-left: 4px
+      label:
+        - justify-self: start
+        - font-size: 12px
+        - color: var(--primary-text-color)
+        - align-self: start
+        - line-height: 1
+        - padding-top: 2px
+        - margin-left: 4px
       card:
-        - height: 90px
+        - height: 66px
         - border-radius: 24px
         - padding: 4px 20px 4px 4px
         - background: var(--contrast2)
-      name:
-        - justify-self: start
-        - font-size: 11px
-        - color: var(--contrast20)
-        - opacity: 0.7
-        - align-self: start
-        - line-height: 1
-        - padding-top: 4px
       custom_fields:
-        room_label:
-          - justify-self: start
+        controls:
+          - justify-self: end
           - align-self: center
-          - font-size: 13px
-          - color: var(--contrast20)
-          - font-weight: 500
-          - text-align: left
-          - padding-top: 2px
-          - padding-left: 14px
   custom_card_sensor_small:
     template: setup
     variables:
@@ -598,7 +690,7 @@ views:
             heading_style: title
             icon: mdi:google-classroom
           - square: false
-            columns: 2
+            columns: 1
             type: grid
             cards:
               - type: custom:button-card
@@ -609,6 +701,8 @@ views:
                   humidity_entity: ''
                   co2_entity: sensor.living_room_co2
                   icon: mdi:sofa
+                  light_entity: light.suur_tuba
+                  target_temp_entity: input_number.living_room_temp
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -625,6 +719,7 @@ views:
                   humidity_entity: ''
                   co2_entity: sensor.attic_co2
                   icon: mdi:home-roof
+                  target_temp_entity: input_number.attic_temp
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -633,6 +728,88 @@ views:
                   humidity_entity: ''
                   co2_entity: sensor.upper_room_co2
                   icon: mdi:chair-rolling
+                  target_temp_entity: input_number.office_temp
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Köök
+                  temp_entity: sensor.kitchen_temperature
+                  humidity_entity: sensor.kitchen_humidity
+                  co2_entity: sensor.kitchen_co2
+                  icon: mdi:chef-hat
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Koridor
+                  temp_entity: sensor.hallway_temperature
+                  humidity_entity: sensor.hallway_humidity
+                  co2_entity: ''
+                  icon: mdi:stairs
+      - type: grid
+        cards:
+          - type: heading
+            heading: Devices
+            heading_style: title
+            icon: mdi:hvac
+          - square: false
+            columns: 1
+            type: grid
+            cards:
+              - type: custom:mushroom-climate-card
+                entity: climate.mill_heatergen3panel
+                fill_container: false
+                show_temperature_control: true
+                collapsible_controls: false
+                tap_action:
+                  action: more-info
+                primary_info: name
+                secondary_info: state
+                hvac_modes: []
+                layout: horizontal
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 66px;
+                      border-radius: 24px;
+                      padding: 4px 20px 4px 4px;
+                      background: var(--contrast2);
+                    }
+              - type: custom:mushroom-climate-card
+                entity: climate.mill_heatergen3panel_2
+                fill_container: false
+                show_temperature_control: true
+                collapsible_controls: false
+                tap_action:
+                  action: more-info
+                primary_info: name
+                secondary_info: state
+                hvac_modes: []
+                layout: horizontal
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 66px;
+                      border-radius: 24px;
+                      padding: 4px 20px 4px 4px;
+                      background: var(--contrast2);
+                    }
+              - type: custom:mushroom-climate-card
+                entity: climate.mitsubishi_pump
+                show_temperature_control: true
+                layout: horizontal
+                tap_action:
+                  action: more-info
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 66px;
+                      border-radius: 24px;
+                      padding: 4px 20px 4px 4px;
+                      background: var(--contrast2);
+                    }
+        column_span: 4
+      - type: grid
+        cards:
           - type: custom:decluttering-card
             template: shared_navbar
     badges:
