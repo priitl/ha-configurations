@@ -60,7 +60,7 @@ button_card_templates:
   custom_card_room_sensor:
     triggers_update:
       - '[[[ return variables.target_temp_entity ]]]'
-      - '[[[ return variables.light_entity ]]]'
+      - '[[[ return variables.light_entities ? variables.light_entities.map(l => l.entity).join(",") : "" ]]]'
       - '[[[ return variables.temp_entity ]]]'
       - '[[[ return variables.humidity_entity ]]]'
       - '[[[ return variables.co2_entity ]]]'
@@ -74,7 +74,7 @@ button_card_templates:
       co2_entity: ''
       radius: 24px
       icon: mdi:thermometer
-      light_entity: ''
+      light_entities: []
       target_temp_entity: ''
     entity: '[[[ return variables.temp_entity ]]]'
     icon: '[[[ return variables.icon ]]]'
@@ -126,98 +126,149 @@ button_card_templates:
       ]]]
     show_label: true
     custom_fields:
-      controls:
+      light1:
         card:
-          type: horizontal-stack
-          cards:
-            - type: custom:button-card
-              entity: '[[[ return variables.light_entity || "" ]]]'
-              show_name: false
-              show_state: false
-              icon: mdi:lightbulb
-              styles:
-                card:
-                  - display: '[[[ return variables.light_entity ? "block" : "none" ]]]'
-                  - background: transparent
-                  - border-radius: 12px
-                  - width: 32px
-                  - height: 32px
-                  - box-shadow: none
-                icon:
-                  - color: var(--contrast20)
-                  - width: 18px
-              tap_action:
-                action: '[[[ return variables.light_entity ? "toggle" : "none" ]]]'
-            - type: custom:button-card
-              entity: '[[[ return variables.target_temp_entity || "" ]]]'
-              icon: mdi:minus
-              show_name: false
-              show_state: false
-              styles:
-                card:
-                  - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
-                  - background: transparent
-                  - box-shadow: none
-                  - width: 32px
-                  - height: 32px
-                  - border-radius: 12px
-                icon:
-                  - color: var(--contrast20)
-                  - width: 18px
-              tap_action:
-                action: perform-action
-                perform_action: input_number.decrement
-                target:
-                  entity_id: '[[[ return variables.target_temp_entity ]]]'
-            - type: custom:button-card
-              entity: '[[[ return variables.target_temp_entity || "sensor.time" ]]]'
-              show_icon: false
-              show_name: false
-              show_state: true
-              state_display: '[[[ return variables.target_temp_entity && states[variables.target_temp_entity] && states[variables.target_temp_entity].state ? parseFloat(states[variables.target_temp_entity].state).toFixed(1).replace(".", ",") : "" ]]]'
-              styles:
-                card:
-                  - display: '[[[ return variables.target_temp_entity ? "flex" : "none" ]]]'
-                  - background: none
-                  - box-shadow: none
-                  - width: 30px
-                  - height: 32px
-                  - align-items: center
-                  - justify-content: center
-                state:
-                  - font-size: 14px
-                  - font-weight: 500
-                  - color: var(--contrast20)
-              tap_action:
-                action: none
-            - type: custom:button-card
-              entity: '[[[ return variables.target_temp_entity || "" ]]]'
-              icon: mdi:plus
-              show_name: false
-              show_state: false
-              styles:
-                card:
-                  - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
-                  - background: transparent
-                  - box-shadow: none
-                  - width: 32px
-                  - height: 32px
-                  - border-radius: 12px
-                icon:
-                  - color: var(--contrast20)
-                  - width: 18px
-              tap_action:
-                action: perform-action
-                perform_action: input_number.increment
-                target:
-                  entity_id: '[[[ return variables.target_temp_entity ]]]'
+          type: custom:button-card
+          entity: '[[[ return variables.light_entities && variables.light_entities[0] ? variables.light_entities[0].entity : "" ]]]'
+          show_name: false
+          show_state: false
+          icon: '[[[ return variables.light_entities && variables.light_entities[0] ? (variables.light_entities[0].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          styles:
+            card:
+              - display: '[[[ return variables.light_entities && variables.light_entities.length > 0 && variables.light_entities[0] ? "block" : "none" ]]]'
+              - background: transparent
+              - border-radius: 12px
+              - width: 32px
+              - height: 32px
+              - box-shadow: none
+            icon:
+              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - width: 18px
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      light2:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.light_entities && variables.light_entities[1] ? variables.light_entities[1].entity : "" ]]]'
+          show_name: false
+          show_state: false
+          icon: '[[[ return variables.light_entities && variables.light_entities[1] ? (variables.light_entities[1].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          styles:
+            card:
+              - display: '[[[ return variables.light_entities && variables.light_entities.length > 1 && variables.light_entities[1] ? "block" : "none" ]]]'
+              - background: transparent
+              - border-radius: 12px
+              - width: 32px
+              - height: 32px
+              - box-shadow: none
+            icon:
+              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - width: 18px
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      light3:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.light_entities && variables.light_entities[2] ? variables.light_entities[2].entity : "" ]]]'
+          show_name: false
+          show_state: false
+          icon: '[[[ return variables.light_entities && variables.light_entities[2] ? (variables.light_entities[2].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          styles:
+            card:
+              - display: '[[[ return variables.light_entities && variables.light_entities.length > 2 && variables.light_entities[2] ? "block" : "none" ]]]'
+              - background: transparent
+              - border-radius: 12px
+              - width: 32px
+              - height: 32px
+              - box-shadow: none
+            icon:
+              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - width: 18px
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      temp_minus:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.target_temp_entity || "" ]]]'
+          icon: mdi:minus
+          show_name: false
+          show_state: false
+          styles:
+            card:
+              - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
+              - background: transparent
+              - box-shadow: none
+              - width: 32px
+              - height: 32px
+              - border-radius: 12px
+            icon:
+              - color: var(--contrast20)
+              - width: 18px
+          tap_action:
+            action: perform-action
+            perform_action: input_number.decrement
+            target:
+              entity_id: '[[[ return variables.target_temp_entity ]]]'
+      temp_display:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.target_temp_entity || "sensor.time" ]]]'
+          show_icon: false
+          show_name: false
+          show_state: true
+          state_display: '[[[ return variables.target_temp_entity && states[variables.target_temp_entity] && states[variables.target_temp_entity].state ? parseFloat(states[variables.target_temp_entity].state).toFixed(1).replace(".", ",") : "" ]]]'
+          styles:
+            card:
+              - display: '[[[ return variables.target_temp_entity ? "flex" : "none" ]]]'
+              - background: none
+              - box-shadow: none
+              - width: 30px
+              - height: 32px
+              - align-items: center
+              - justify-content: center
+            state:
+              - font-size: 14px
+              - font-weight: 500
+              - color: var(--contrast20)
+          tap_action:
+            action: none
+      temp_plus:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.target_temp_entity || "" ]]]'
+          icon: mdi:plus
+          show_name: false
+          show_state: false
+          styles:
+            card:
+              - display: '[[[ return variables.target_temp_entity ? "block" : "none" ]]]'
+              - background: transparent
+              - box-shadow: none
+              - width: 32px
+              - height: 32px
+              - border-radius: 12px
+            icon:
+              - color: var(--contrast20)
+              - width: 18px
+          tap_action:
+            action: perform-action
+            perform_action: input_number.increment
+            target:
+              entity_id: '[[[ return variables.target_temp_entity ]]]'
     styles:
       grid:
-        - grid-template-columns: 50px 1fr min-content
-        - grid-template-areas: '"i n controls" "i l controls"'
+        - grid-template-columns: 50px 1fr repeat(6, 32px)
+        - grid-template-areas: '"i n light3 light2 light1 temp_minus temp_display temp_plus" "i l light3 light2 light1 temp_minus temp_display temp_plus"'
         - grid-template-rows: auto auto
         - align-content: center
         - gap: 2px
+        - column-gap: 1px
       icon:
         - width: 24px
         - color: '#6f6f6f'
@@ -245,6 +296,9 @@ button_card_templates:
         - line-height: 1
         - padding-top: 2px
         - margin-left: 4px
+        - text-overflow: unset
+        - overflow: visible
+        - white-space: nowrap
       card:
         - height: 66px
         - border-radius: 24px
@@ -701,16 +755,11 @@ views:
                   humidity_entity: ''
                   co2_entity: sensor.living_room_co2
                   icon: mdi:sofa
-                  light_entity: light.suur_tuba
+                  light_entities:
+                    - entity: light.suure_toa_soogilaua_tuled
+                      name: Söögilaua tuled
+                      icon: mdi:lightbulb-group
                   target_temp_entity: input_number.living_room_temp
-              - type: custom:button-card
-                template: custom_card_room_sensor
-                variables:
-                  room_name: Vasja Tuba
-                  temp_entity: sensor.esp32_vasja_tuba_sht41_temperature
-                  humidity_entity: sensor.esp32_vasja_tuba_sht41_humidity
-                  co2_entity: sensor.esp32_vasja_tuba_co2
-                  icon: mdi:human-cane
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -720,6 +769,23 @@ views:
                   co2_entity: sensor.attic_co2
                   icon: mdi:home-roof
                   target_temp_entity: input_number.attic_temp
+                  light_entities:
+                    - entity: light.shellydimmer2_ec64c9c66cdd
+                      name: Pööningutoa ripplambid
+                      icon: mdi:ceiling-light
+                      brightness: false
+                      collapsible: true
+                    - entity: light.shellydimmer2_ec64c9c4d1f4
+                      name: Pööningutoa LED
+                      icon: mdi:light-flood-up
+                    - entity: light.h619a
+                      name: Arvutikapi LED
+                      icon: mdi:led-strip-variant
+                      brightness: true
+                      color_temp: true
+                      color: true
+                      collapsible: true
+                      use_color: true
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -737,6 +803,10 @@ views:
                   humidity_entity: sensor.kitchen_humidity
                   co2_entity: sensor.kitchen_co2
                   icon: mdi:chef-hat
+                  light_entities:
+                    - entity: switch.nutipistik_1
+                      name: Köögi LED
+                      icon: mdi:led-strip-variant
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -745,6 +815,14 @@ views:
                   humidity_entity: sensor.hallway_humidity
                   co2_entity: ''
                   icon: mdi:stairs
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Vasja Tuba
+                  temp_entity: sensor.esp32_vasja_tuba_sht41_temperature
+                  humidity_entity: sensor.esp32_vasja_tuba_sht41_humidity
+                  co2_entity: sensor.esp32_vasja_tuba_co2
+                  icon: mdi:human-cane
       - type: grid
         cards:
           - type: heading
