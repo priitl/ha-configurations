@@ -23,6 +23,9 @@ button_card_templates:
       grid:
         - grid-template-columns: 62px 1fr
         - grid-template-areas: '"i l" "i n"'
+        - grid-template-rows: auto auto
+        - align-content: center
+        - gap: 2px
       icon:
         - width: 24px
         - color: var(--contrast20)
@@ -33,12 +36,14 @@ button_card_templates:
         - background: var(--contrast1)
         - border-radius: 50%
         - margin-left: 7px
+        - align-self: center
       label:
         - justify-self: start
         - font-size: 20px
-        - padding-top: 4px
         - font-weight: 500
         - color: var(--contrast20)
+        - align-self: end
+        - line-height: 1
       card:
         - height: 66px
         - border-radius: 24px
@@ -49,7 +54,114 @@ button_card_templates:
         - font-size: 11px
         - color: var(--contrast20)
         - opacity: 0.7
-        - padding-bottom: 7px
+        - align-self: start
+        - line-height: 1
+        - padding-top: 4px
+  custom_card_room_sensor:
+    template: setup
+    variables:
+      room_name: ''
+      temp_entity: ''
+      humidity_entity: ''
+      co2_entity: ''
+      radius: 24px
+      icon: mdi:thermometer
+    entity: '[[[ return variables.temp_entity ]]]'
+    name: |
+      [[[
+        if (variables.co2_entity && variables.co2_entity !== "") {
+          var co2State = states[variables.co2_entity];
+          var co2Value;
+
+          if (co2State && co2State.state !== 'unavailable' && co2State.state !== 'unknown') {
+            co2Value = parseFloat(co2State.state);
+          } else {
+            // Generate random CO2 value between 400-1200 ppm for testing
+            co2Value = Math.floor(Math.random() * 800) + 400;
+          }
+
+          return `${co2Value} ppm`;
+        }
+        return "";
+      ]]]
+    icon: '[[[ return variables.icon ]]]'
+    show_label: true
+    label: |
+      [[[
+        var tempEntity = states[variables.temp_entity];
+        var temp;
+
+        // Handle climate entities (use current_temperature attribute) vs sensor entities (use state)
+        if (tempEntity) {
+          if (variables.temp_entity.startsWith('climate.')) {
+            temp = tempEntity.attributes.current_temperature;
+          } else {
+            temp = tempEntity.state;
+          }
+        }
+
+        // Handle humidity with random fallback
+        var humState = variables.humidity_entity ? states[variables.humidity_entity] : null;
+        var humValue;
+        if (humState && humState.state !== 'unavailable' && humState.state !== 'unknown') {
+          humValue = parseFloat(humState.state);
+        } else {
+          // Generate random humidity value between 30-70% for testing
+          humValue = Math.floor(Math.random() * 40) + 30;
+        }
+
+        return `${parseFloat(temp).toFixed(0)}°<span style="font-size: 0.5em;opacity:0.7">${humValue.toFixed(0)}%</span>`;
+      ]]]
+    custom_fields:
+      room_label: '[[[ return variables.room_name ]]]'
+    styles:
+      grid:
+        - grid-template-columns: 62px 1fr
+        - grid-template-areas: '"i l" "i n" "room_label room_label"'
+        - grid-template-rows: auto auto auto
+        - align-content: center
+        - gap: 2px
+      icon:
+        - width: 24px
+        - color: var(--contrast20)
+      img_cell:
+        - justify-self: start
+        - width: 45px
+        - height: 45px
+        - background: var(--contrast1)
+        - border-radius: 50%
+        - margin-left: 7px
+        - align-self: center
+      label:
+        - justify-self: start
+        - font-size: 20px
+        - font-weight: 500
+        - color: var(--contrast20)
+        - align-self: end
+        - line-height: 1
+      card:
+        - height: 90px
+        - border-radius: 24px
+        - padding: 4px 20px 4px 4px
+        - background: var(--contrast2)
+      name:
+        - justify-self: start
+        - font-size: 11px
+        - color: var(--contrast20)
+        - opacity: 0.7
+        - align-self: start
+        - line-height: 1
+        - padding-top: 4px
+      custom_fields:
+        room_label:
+          - justify-self: start
+          - align-self: center
+          - font-size: 13px
+          - color: var(--contrast20)
+          - font-weight: 500
+          - text-align: left
+          - padding-top: 2px
+          - padding-left: 14px
   custom_card_sensor_small:
     template: setup
     variables:
@@ -165,10 +277,193 @@ button_card_templates:
         - color: var(--contrast20)
         - opacity: 0.7
         - padding-bottom: 7px
-        - grid-area: n
+        - grid-area: 'n'
       custom_fields:
         slider:
           - padding-left: 16px
+  custom_card_user:
+    template: setup
+    show_entity_picture: false
+    show_icon: false
+    show_label: true
+    entity: |
+      [[[
+        return "person." + user.name.toLowerCase() + "l"
+      ]]]
+    name: '[[[return "Hello, " + user.name]]]'
+    label: |
+      [[[
+        if (entity && entity.state == "home") {
+          return "Welcome home.";
+        } else {
+          return "See you later.";
+        }
+      ]]]
+    tap_action:
+      action: navigate
+      navigation_path: settings
+    state:
+      - value: not_home
+        styles:
+          entity_picture:
+            - filter: grayscale(100%)
+      - value: unknown
+        styles:
+          entity_picture:
+            - filter: grayscale(100%)
+    styles:
+      card:
+        - padding: 12px 0px 12px 12px
+        - background: none
+        - box-shadow: none
+      grid:
+        - grid-template-areas: '"pic n one two three four" "pic l one two three four"'
+        - grid-template-rows: min-content min-content min-content
+        - grid-template-columns: 50px 1fr 50px 50px 50px 50px
+      name:
+        - justify-self: start
+        - align-self: center
+        - font-weight: 700
+        - font-size: 15px
+        - padding-left: 15px
+      label:
+        - justify-self: start
+        - align-self: start
+        - font-size: 12px
+        - font-weight: 500
+        - color: var(--contrast14)
+        - padding-left: 15px
+      entity_picture:
+        - width: 40px
+        - height: 40px
+        - border-radius: 12px
+      custom_fields:
+        badge:
+          - position: absolute
+          - left: 47px
+          - top: 9px
+    custom_fields:
+      badge:
+        card:
+          type: custom:button-card
+          entity: '[[[ return entity.entity_id ]]]'
+          show_icon: true
+          show_name: false
+          icon: mdi:account-tie-voice
+          state:
+            - value: not_home
+              styles:
+                card:
+                  - background: var(--red)
+            - value: unknown
+              styles:
+                card:
+                  - background: var(--red)
+          styles:
+            card:
+              - border-radius: 50%
+              - width: 16px
+              - height: 16px
+              - background: var(--green)
+              - z-index: 1
+            icon:
+              - color: var(--black)
+              - width: 10px
+      pic:
+        card:
+          type: custom:button-card
+          entity: '[[[ return entity.entity_id ]]]'
+          show_name: false
+          show_entity_picture: true
+          state:
+            - value: not_home
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+            - value: unknown
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+          double_tap_action:
+            action: assist
+            pipeline_id: preferred
+          styles:
+            card:
+              - background: none
+              - box-shadow: none
+            entity_picture:
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+            img_cell:
+              - background-color: var(--contrast1)
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+      one:
+        card:
+          type: custom:button-card
+          entity: person.priitl
+          show_name: false
+          show_entity_picture: true
+          state:
+            - value: not_home
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+            - value: unknown
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+          styles:
+            card:
+              - background: none
+              - box-shadow: none
+              - z-index: 5
+              - margin-left: 60px
+            entity_picture:
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+            img_cell:
+              - background-color: var(--contrast1)
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+      two:
+        card:
+          type: custom:button-card
+          entity: person.tarmol
+          show_name: false
+          show_entity_picture: true
+          state:
+            - value: not_home
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+            - value: unknown
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+          styles:
+            card:
+              - background: none
+              - box-shadow: none
+              - z-index: 4
+              - margin-left: 40px
+            entity_picture:
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+            img_cell:
+              - background-color: var(--contrast1)
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
 kiosk_mode:
   non_admin_settings:
     hide_header: true
@@ -201,30 +496,9 @@ decluttering_templates:
         - url: /dashboard-2k25/home
           icon: mdi:home
           label: Home
-        - url: /dashboard-2k25/rooms
-          icon: mdi:sofa-outline
-          label: Rooms
-          hold_action:
-            action: navigate
-            navigation_path: /config/devices/dashboard
-          popup:
-            - icon: mdi:sofa-outline
-              label: Suur tuba
-              url: home#suur-tuba
-            - icon: mdi:home-roof
-              label: Pööningutuba
-              url: home#pooningutuba
-            - icon: mdi:chair-rolling
-              label: Kontor
-              url: home#kontor
-            - icon: mdi:human-cane
-              label: Vasja tuba
-              url: home#vasja-tuba
-            - icon: mdi:stairs
-              label: Koridor
-              url: home#koridor
           tap_action:
-            action: open-popup
+            action: navigate
+            navigation_path: /dashboard-2k25/home
         - url: /dashboard-2k25/energy
           icon: mdi:flash
           label: Energy
@@ -250,9 +524,6 @@ decluttering_templates:
                 {% else %}
                   green
                 {% endif %}
-          hold_action:
-            action: navigate
-            navigation_path: /energy
         - icon: mdi:dots-horizontal
           label: More
           tap_action:
@@ -271,6 +542,7 @@ decluttering_templates:
                   text: Are you sure you want to restart Home Assistant?
       desktop:
         position: left
+        min_width: 768
         show_labels: true
       mobile:
         show_labels: true
@@ -297,48 +569,190 @@ decluttering_templates:
           # Good Night, {{user}}!
           It's {{ states("sensor.time") }}, the weather is {{ state_translated("weather.ilm_lepiksaare") | lower }} with {{ state_attr("weather.ilm_lepiksaare","temperature") }}°C.
         {% endif %}
-      visibility:
-        - condition: screen
-          media_query: '(min-width: 768px)'
 views:
   - path: home
     header:
       card:
         type: custom:decluttering-card
         template: shared_header
+        visibility:
+          - condition: screen
+            media_query: '(min-width: 768px)'
       layout: responsive
       badges_position: top
       badges_wrap: scroll
     sections:
       - type: grid
         cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:button-card
+                template: custom_card_user
+              - type: custom:bubble-card
+                card_type: empty-column
+            visibility:
+              - condition: screen
+                media_query: '(min-width: 0px) and (max-width: 767px)'
+          - type: heading
+            heading: Rooms
+            heading_style: title
+            icon: mdi:google-classroom
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Suur Tuba
+                  temp_entity: sensor.mitsubishi_pump_indoor
+                  humidity_entity: ''
+                  co2_entity: sensor.living_room_co2
+                  icon: mdi:sofa
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Vasja Tuba
+                  temp_entity: sensor.esp32_vasja_tuba_sht41_temperature
+                  humidity_entity: sensor.esp32_vasja_tuba_sht41_humidity
+                  co2_entity: sensor.esp32_vasja_tuba_co2
+                  icon: mdi:human-cane
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Pööningutuba
+                  temp_entity: climate.mill_heatergen3panel_2
+                  humidity_entity: ''
+                  co2_entity: sensor.attic_co2
+                  icon: mdi:home-roof
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Kontor
+                  temp_entity: climate.mill_heatergen3panel
+                  humidity_entity: ''
+                  co2_entity: sensor.upper_room_co2
+                  icon: mdi:chair-rolling
           - type: custom:decluttering-card
             template: shared_navbar
+    badges:
+      - type: custom:mushroom-template-badge
+        icon: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            mdi:home-export-outline
+          {% else %}
+            mdi:home
+          {% endif %}
+        content: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            Away
+          {% else %}
+            Home
+          {% endif %}
+        color: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            orange
+          {% else %}
+            green
+          {% endif %}
+        entity: input_boolean.away_mode
+        tap_action:
+          action: toggle
   - path: rooms
     header:
       card:
         type: custom:decluttering-card
         template: shared_header
+        visibility:
+          - condition: screen
+            media_query: '(min-width: 768px)'
       layout: responsive
       badges_position: top
       badges_wrap: scroll
     sections:
       - type: grid
         cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:button-card
+                template: custom_card_user
+              - type: custom:bubble-card
+                card_type: empty-column
+            visibility:
+              - condition: screen
+                media_query: '(min-width: 0px) and (max-width: 767px)'
           - type: custom:decluttering-card
             template: shared_navbar
+    badges:
+      - type: custom:mushroom-template-badge
+        icon: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            mdi:home-export-outline
+          {% else %}
+            mdi:home
+          {% endif %}
+        content: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            Away
+          {% else %}
+            Home
+          {% endif %}
+        color: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            orange
+          {% else %}
+            green
+          {% endif %}
+        entity: input_boolean.away_mode
+        tap_action:
+          action: toggle
   - path: energy
     header:
       card:
         type: custom:decluttering-card
         template: shared_header
+        visibility:
+          - condition: screen
+            media_query: '(min-width: 768px)'
       layout: responsive
       badges_position: top
       badges_wrap: scroll
     max_columns: 3
+    badges:
+      - type: custom:mushroom-template-badge
+        icon: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            mdi:home-export-outline
+          {% else %}
+            mdi:home
+          {% endif %}
+        content: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            Away
+          {% else %}
+            Home
+          {% endif %}
+        color: |
+          {% if is_state('input_boolean.away_mode', 'on') %}
+            orange
+          {% else %}
+            green
+          {% endif %}
+        entity: input_boolean.away_mode
+        tap_action:
+          action: toggle
     sections:
       - type: grid
         cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:button-card
+                template: custom_card_user
+              - type: custom:bubble-card
+                card_type: empty-column
+            visibility:
+              - condition: screen
+                media_query: '(min-width: 0px) and (max-width: 767px)'
           - type: heading
             heading: Overview
             heading_style: title
@@ -658,7 +1072,7 @@ views:
               - entity: sensor.current_energy_price_eur
                 name: Energy Price
                 type: area
-                color: 'var(--red)'
+                color: var(--red)
                 stroke_width: 3
                 float_precision: 2
                 unit: €/kWh
@@ -674,7 +1088,7 @@ views:
               - entity: sensor.shellypro3em_2cbcbba6f604_total_active_energy
                 name: Energy Consumption
                 type: column
-                color: 'var(--blue)'
+                color: var(--blue)
                 opacity: 0.6
                 stroke_width: 1
                 float_precision: 2
@@ -708,32 +1122,32 @@ views:
                   rangeBarOverlap: false
                   distributed: false
                   dataLabels:
-                    position: 'center'
+                    position: center
                 area:
-                  fillTo: 'origin'
+                  fillTo: origin
               stroke:
                 colors:
-                  - 'var(--red)'
-                  - 'var(--blue)'
+                  - var(--red)
+                  - var(--blue)
                 width:
                   - 3
                   - 1
               grid:
-                borderColor: 'var(--contrast6)'
+                borderColor: var(--contrast6)
                 strokeDashArray: 2
               xaxis:
                 type: datetime
                 labels:
                   style:
                     fontSize: 11px
-                    colors: 'var(--contrast15)'
+                    colors: var(--contrast15)
                 axisBorder:
                   show: false
                 axisTicks:
                   show: false
                 crosshairs:
                   show: true
-                  position: 'back'
+                  position: back
               yaxis:
                 - id: left
                   title:
@@ -741,7 +1155,7 @@ views:
                   opposite: false
                   labels:
                     style:
-                      colors: 'var(--contrast12)'
+                      colors: var(--contrast12)
                     formatter: |
                       EVAL:function(value) {
                         return value.toFixed(2);
@@ -751,7 +1165,7 @@ views:
                     text: ''
                   labels:
                     style:
-                      colors: 'var(--contrast12)'
+                      colors: var(--contrast12)
                     formatter: |
                       EVAL:function(value) {
                         return value.toFixed(2);
@@ -772,30 +1186,30 @@ views:
                   }
               annotations:
                 yaxis:
-                  - y: 'max'
+                  - 'y': max
                     yAxisIndex: 0
-                    borderColor: 'transparent'
+                    borderColor: transparent
                     label:
-                      borderColor: 'transparent'
+                      borderColor: transparent
                       style:
-                        background: 'transparent'
-                        color: 'var(--contrast12)'
-                        fontSize: '11px'
-                      text: 'ct/kWh'
-                      position: 'left'
+                        background: transparent
+                        color: var(--contrast12)
+                        fontSize: 11px
+                      text: ct/kWh
+                      position: left
                       offsetX: 25
                       offsetY: 35
-                  - y: 'max'
+                  - 'y': max
                     yAxisIndex: 1
-                    borderColor: 'transparent'
+                    borderColor: transparent
                     label:
-                      borderColor: 'transparent'
+                      borderColor: transparent
                       style:
-                        background: 'transparent'
-                        color: 'var(--contrast12)'
-                        fontSize: '11px'
-                      text: 'kWh'
-                      position: 'right'
+                        background: transparent
+                        color: var(--contrast12)
+                        fontSize: 11px
+                      text: kWh
+                      position: right
                       offsetX: 15
                       offsetY: 35
               legend:
