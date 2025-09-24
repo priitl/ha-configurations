@@ -1,0 +1,810 @@
+button_card_templates:
+  setup:
+    tap_action:
+      action: more-info
+    show_icon: true
+    show_name: true
+    show_state: false
+  custom_card_sensor_medium:
+    template: setup
+    variables:
+      state: |
+        [[[
+          var st = states[entity.entity_id].state;
+          var uni = ' %';
+          return `
+          ${parseFloat(st).toFixed(0)}<span style="font-size:
+        0.5em;opacity:0.7">${uni}</span>
+          `
+        ]]]
+    show_label: true
+    label: '[[[ return variables.state ]]]'
+    styles:
+      grid:
+        - grid-template-columns: 62px 1fr
+        - grid-template-areas: '"i l" "i n"'
+      icon:
+        - width: 24px
+        - color: var(--contrast20)
+      img_cell:
+        - justify-self: start
+        - width: 45px
+        - height: 45px
+        - background: var(--contrast1)
+        - border-radius: 50%
+        - margin-left: 7px
+      label:
+        - justify-self: start
+        - font-size: 20px
+        - padding-top: 4px
+        - font-weight: 500
+        - color: var(--contrast20)
+      card:
+        - height: 66px
+        - border-radius: 24px
+        - padding: 4px 20px 4px 4px
+        - background: var(--contrast2)
+      name:
+        - justify-self: start
+        - font-size: 11px
+        - color: var(--contrast20)
+        - opacity: 0.7
+        - padding-bottom: 7px
+  custom_card_sensor_small:
+    template: setup
+    variables:
+      state: |
+        [[[
+          var st = states[entity.entity_id].state;
+          var uni = ' %';
+          return `
+          ${parseFloat(st).toFixed(0)}<span style="font-size:
+        0.5em;opacity:0.7">${uni}</span>
+          `
+        ]]]
+    show_label: true
+    show_icon: false
+    label: '[[[ return variables.state ]]]'
+    styles:
+      grid:
+        - grid-template-columns: 1fr
+        - grid-template-areas: '"l" "n"'
+      label:
+        - justify-self: start
+        - font-size: 20px
+        - padding-top: 4px
+        - font-weight: 500
+        - color: var(--contrast20)
+      card:
+        - height: 66px
+        - border-radius: 24px
+        - padding: 12px 10px 10px 14px
+        - background: var(--contrast2)
+      name:
+        - justify-self: start
+        - font-size: 11px
+        - color: var(--contrast20)
+        - opacity: 0.7
+        - padding-bottom: 7px
+  custom_card_slider:
+    template: setup
+    tap_action:
+      action: none
+    variables:
+      state: |
+        [[[
+          var st = states[entity.entity_id].state;
+          var uni = variables.unit || ' ct/kWh';
+          var precision = variables.precision || 1;
+          return `
+          ${parseFloat(st).toFixed(precision)}<span style="font-size:
+        0.5em;opacity:0.7">${uni}</span>
+          `
+        ]]]
+    show_label: true
+    label: '[[[ return variables.state ]]]'
+    custom_fields:
+      slider:
+        card:
+          type: custom:my-slider-v2
+          entity: '[[[ return entity.entity_id ]]]'
+          mode: position
+          step: 0.1
+          styles:
+            container:
+              - background: none
+              - border-radius: 100px
+              - overflow: visible
+            card:
+              - height: 24px
+              - padding: 0 8px
+              - background: var(--contrast6)
+            track:
+              - overflow: visible
+              - background: none
+            progress:
+              - background: none
+            thumb:
+              - background: var(--contrast12)
+              - top: 2px
+              - right: '-8px'
+              - height: 20px
+              - width: 20px
+              - border-radius: 10px
+    styles:
+      grid:
+        - grid-template-columns: 62px 1fr
+        - grid-template-areas: '"i l" "i n" "slider slider"'
+        - grid-template-rows: auto auto auto
+      icon:
+        - width: 24px
+        - color: var(--contrast20)
+      img_cell:
+        - justify-self: start
+        - width: 45px
+        - height: 45px
+        - background: var(--contrast1)
+        - border-radius: 50%
+        - margin-left: 7px
+        - grid-area: i
+      label:
+        - justify-self: start
+        - font-size: 20px
+        - padding-top: 4px
+        - font-weight: 500
+        - color: var(--contrast20)
+        - grid-area: l
+      card:
+        - height: 100px
+        - border-radius: 24px
+        - padding: 4px 20px 4px 4px
+        - background: var(--contrast2)
+      name:
+        - justify-self: start
+        - font-size: 11px
+        - color: var(--contrast20)
+        - opacity: 0.7
+        - padding-bottom: 7px
+        - grid-area: n
+      custom_fields:
+        slider:
+          - padding-left: 16px
+kiosk_mode:
+  non_admin_settings:
+    hide_header: true
+    ignore_entity_settings: true
+  entity_settings:
+    - entity:
+        input_boolean.hide_view_headers: 'on'
+      hide_header: true
+    - entity:
+        input_boolean.hide_view_headers: 'off'
+      hide_header: false
+decluttering_templates:
+  footer_template:
+    default:
+      - color-1: var(--contrast20)
+      - color-2: var(--contrast20)
+      - color-3: var(--contrast20)
+      - color-4: var(--contrast20)
+      - color-5: var(--contrast20)
+      - bgcolor-1: var(--contrast4)
+      - bgcolor-2: var(--contrast4)
+      - bgcolor-3: var(--contrast4)
+      - bgcolor-4: var(--contrast4)
+      - bgcolor-5: var(--contrast4)
+  shared_navbar:
+    default: []
+    card:
+      type: custom:navbar-card
+      routes:
+        - url: /dashboard-2k25/home
+          icon: mdi:home
+          label: Home
+        - url: /dashboard-2k25/rooms
+          icon: mdi:sofa-outline
+          label: Rooms
+          hold_action:
+            action: navigate
+            navigation_path: /config/devices/dashboard
+          popup:
+            - icon: mdi:sofa-outline
+              label: Suur tuba
+              url: home#suur-tuba
+            - icon: mdi:home-roof
+              label: Pööningutuba
+              url: home#pooningutuba
+            - icon: mdi:chair-rolling
+              label: Kontor
+              url: home#kontor
+            - icon: mdi:human-cane
+              label: Vasja tuba
+              url: home#vasja-tuba
+            - icon: mdi:stairs
+              label: Koridor
+              url: home#koridor
+          tap_action:
+            action: open-popup
+        - url: /dashboard-2k25/energy
+          icon: mdi:flash
+          label: Energy
+          tap_action:
+            action: navigate
+            navigation_path: /dashboard-2k25/energy
+          badge:
+            - condition: template
+              value_template: >-
+                {{ states('sensor.shellypro3em_2cbcbba6f604_total_active_power')
+                | float(0) > 1 }}
+              text: >-
+                {{
+                (states('sensor.shellypro3em_2cbcbba6f604_total_active_power') |
+                float(0)) | round(1) }}kW
+              color: >
+                {% set power =
+                states('sensor.shellypro3em_2cbcbba6f604_total_active_power') |
+                float(0) %} {% if power > 5 %}
+                  red
+                {% elif power > 2 %}
+                  orange
+                {% else %}
+                  green
+                {% endif %}
+          hold_action:
+            action: navigate
+            navigation_path: /energy
+        - icon: mdi:dots-horizontal
+          label: More
+          tap_action:
+            action: open-popup
+          popup:
+            - icon: mdi:cog
+              url: /config/dashboard
+            - icon: mdi:hammer
+              url: /developer-tools/yaml
+            - icon: mdi:power
+              tap_action:
+                action: call-service
+                service: homeassistant.restart
+                service_data: {}
+                confirmation:
+                  text: Are you sure you want to restart Home Assistant?
+      desktop:
+        position: left
+        show_labels: true
+      mobile:
+        show_labels: true
+      media_player:
+        entity: media_player.denon_avr_x2800h_2
+        album_cover_background: true
+  shared_header:
+    default:
+      - greeting_text: Good Morning
+    card:
+      type: markdown
+      text_only: true
+      content: |-
+        {% if (states("sensor.time_of_day") == "morning") %}
+          # Good Morning, {{user}}!
+          It's {{ states("sensor.time") }}, the weather is {{ state_translated("weather.ilm_lepiksaare") | lower }} with {{ state_attr("weather.ilm_lepiksaare","temperature") }}°C.
+        {% elif (states("sensor.time_of_day") == "day") %}
+          # Hey, {{user}}!
+          It's {{ states("sensor.time") }}, the weather is {{ state_translated("weather.ilm_lepiksaare") | lower }} with {{ state_attr("weather.ilm_lepiksaare","temperature") }}°C.
+        {% elif (states("sensor.time_of_day") == "evening") %}
+          # Good Evening, {{user}}!
+          It's {{ states("sensor.time") }}, the weather is {{ state_translated("weather.ilm_lepiksaare") | lower }} with {{ state_attr("weather.ilm_lepiksaare","temperature") }}°C.
+        {% elif (states("sensor.time_of_day") == "night") %}
+          # Good Night, {{user}}!
+          It's {{ states("sensor.time") }}, the weather is {{ state_translated("weather.ilm_lepiksaare") | lower }} with {{ state_attr("weather.ilm_lepiksaare","temperature") }}°C.
+        {% endif %}
+      visibility:
+        - condition: screen
+          media_query: '(min-width: 768px)'
+views:
+  - path: home
+    header:
+      card:
+        type: custom:decluttering-card
+        template: shared_header
+      layout: responsive
+      badges_position: top
+      badges_wrap: scroll
+    sections:
+      - type: grid
+        cards:
+          - type: custom:decluttering-card
+            template: shared_navbar
+  - path: rooms
+    header:
+      card:
+        type: custom:decluttering-card
+        template: shared_header
+      layout: responsive
+      badges_position: top
+      badges_wrap: scroll
+    sections:
+      - type: grid
+        cards:
+          - type: custom:decluttering-card
+            template: shared_navbar
+  - path: energy
+    header:
+      card:
+        type: custom:decluttering-card
+        template: shared_header
+      layout: responsive
+      badges_position: top
+      badges_wrap: scroll
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Overview
+            heading_style: title
+            icon: mdi:view-dashboard
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - type: custom:button-card
+                template: custom_card_sensor_medium
+                entity: sensor.shellypro3em_2cbcbba6f604_total_active_power
+                name: Power Current
+                icon: mdi:lightning-bolt
+                variables:
+                  state: |
+                    [[[
+                      var st = states[entity.entity_id].state;
+                      var uni = ' kW';
+                      return `
+                      ${parseFloat(st).toFixed(2)}<span style="font-size:
+                    0.5em;opacity:0.7">${uni}</span>
+                      `
+                    ]]]
+              - type: custom:button-card
+                template: custom_card_sensor_medium
+                entity: sensor.current_energy_price_eur
+                name: Current Price
+                icon: mdi:currency-eur
+                variables:
+                  state: |
+                    [[[
+                      var st = states[entity.entity_id].state;
+                      var uni = ' ct/kWh';
+                      return `
+                      ${(parseFloat(st)*100).toFixed(2)}<span style="font-size:
+                    0.5em;opacity:0.7">${uni}</span>
+                      `
+                    ]]]
+              - type: custom:button-card
+                template: custom_card_sensor_medium
+                entity: sensor.daily_energy
+                name: Daily Energy
+                icon: mdi:calendar-today
+                variables:
+                  state: |
+                    [[[
+                      var st = states[entity.entity_id].state;
+                      var uni = ' kWh';
+                      return `
+                      ${parseFloat(st).toFixed(2)}<span style="font-size:
+                    0.5em;opacity:0.7">${uni}</span>
+                      `
+                    ]]]
+              - type: custom:button-card
+                template: custom_card_sensor_medium
+                entity: sensor.daily_energy_cost
+                name: Daily Cost
+                icon: mdi:cash
+                variables:
+                  state: |
+                    [[[
+                      var st = states[entity.entity_id].state;
+                      var uni = ' €';
+                      return `
+                      ${parseFloat(st).toFixed(2)}<span style="font-size:
+                    0.5em;opacity:0.7">${uni}</span>
+                      `
+                    ]]]
+      - type: grid
+        cards:
+          - type: heading
+            heading: Insights
+            heading_style: title
+            icon: mdi:lightbulb-on
+          - square: false
+            columns: 1
+            type: grid
+            cards:
+              - type: custom:button-card
+                variables:
+                  state: |
+                    [[[
+                      var power = parseFloat(states['sensor.shellypro3em_2cbcbba6f604_total_active_power'].state);
+                      if (power > 5) {
+                        return 'High Usage Alert';
+                      } else if (power > 2) {
+                        return 'Moderate Usage';
+                      } else {
+                        return 'Low Usage';
+                      }
+                    ]]]
+                  secondary: |
+                    [[[
+                      var power = parseFloat(states['sensor.shellypro3em_2cbcbba6f604_total_active_power'].state);
+                      if (power > 5) {
+                        return 'Consider reducing usage during peak hours';
+                      } else if (power > 2) {
+                        return 'Normal household consumption';
+                      } else {
+                        return 'Great! Low energy consumption';
+                      }
+                    ]]]
+                show_label: true
+                show_name: true
+                show_icon: true
+                label: '[[[ return variables.state ]]]'
+                name: '[[[ return variables.secondary ]]]'
+                icon: |
+                  [[[
+                    var power = parseFloat(states['sensor.shellypro3em_2cbcbba6f604_total_active_power'].state);
+                    if (power > 5) {
+                      return 'mdi:alert';
+                    } else if (power > 2) {
+                      return 'mdi:information';
+                    } else {
+                      return 'mdi:check-circle';
+                    }
+                  ]]]
+                styles:
+                  grid:
+                    - grid-template-columns: 62px 1fr
+                    - grid-template-areas: '"i l" "i n"'
+                  icon:
+                    - width: 24px
+                    - color: |
+                        [[[
+                          var power = parseFloat(states['sensor.shellypro3em_2cbcbba6f604_total_active_power'].state);
+                          if (power > 5) {
+                            return 'red';
+                          } else if (power > 2) {
+                            return 'orange';
+                          } else {
+                            return 'green';
+                          }
+                        ]]]
+                  img_cell:
+                    - justify-self: start
+                    - width: 45px
+                    - height: 45px
+                    - background: var(--contrast1)
+                    - border-radius: 50%
+                    - margin-left: 7px
+                  label:
+                    - justify-self: start
+                    - font-size: 18px
+                    - padding-top: 4px
+                    - font-weight: 500
+                    - color: var(--contrast20)
+                  card:
+                    - height: 66px
+                    - border-radius: 24px
+                    - padding: 4px 20px 4px 4px
+                    - background: var(--contrast2)
+                  name:
+                    - justify-self: start
+                    - font-size: 11px
+                    - color: var(--contrast20)
+                    - opacity: 0.7
+                    - padding-bottom: 7px
+                    - overflow: visible
+                    - white-space: normal
+                    - word-wrap: break-word
+              - type: custom:button-card
+                variables:
+                  state: |
+                    [[[
+                      var price = parseFloat(states['sensor.current_energy_price_eur'].state);
+                      if (price > 0.40) {
+                        return 'Extremely Expensive';
+                      } else if (price > 0.27) {
+                        return 'Very Expensive';
+                      } else if (price > 0.21) {
+                        return 'Expensive';
+                      } else if (price > 0.13) {
+                        return 'Average Price';
+                      } else if (price > 0.08) {
+                        return 'Good Price';
+                      } else {
+                        return 'Excellent Price';
+                      }
+                    ]]]
+                  secondary: |
+                    [[[
+                      var price = parseFloat(states['sensor.current_energy_price_eur'].state);
+                      if (price > 0.40) {
+                        return 'Avoid heavy usage if possible';
+                      } else if (price > 0.27) {
+                        return 'Consider reducing usage';
+                      } else if (price > 0.21) {
+                        return 'Use energy wisely';
+                      } else if (price > 0.13) {
+                        return 'Normal energy usage';
+                      } else if (price > 0.08) {
+                        return 'Good time for energy tasks';
+                      } else {
+                        return 'Perfect time for heavy usage';
+                      }
+                    ]]]
+                show_label: true
+                show_name: true
+                show_icon: true
+                label: '[[[ return variables.state ]]]'
+                name: '[[[ return variables.secondary ]]]'
+                icon: |
+                  [[[
+                    var price = parseFloat(states['sensor.current_energy_price_eur'].state);
+                    if (price > 0.40) {
+                      return 'mdi:alert-octagon';
+                    } else if (price > 0.27) {
+                      return 'mdi:alert';
+                    } else if (price > 0.21) {
+                      return 'mdi:trending-up';
+                    } else if (price > 0.13) {
+                      return 'mdi:trending-neutral';
+                    } else if (price > 0.08) {
+                      return 'mdi:trending-down';
+                    } else {
+                      return 'mdi:check-circle';
+                    }
+                  ]]]
+                styles:
+                  grid:
+                    - grid-template-columns: 62px 1fr
+                    - grid-template-areas: '"i l" "i n"'
+                  icon:
+                    - width: 24px
+                    - color: |
+                        [[[
+                          var price = parseFloat(states['sensor.current_energy_price_eur'].state);
+                          if (price > 0.40) {
+                            return 'var(--red)';
+                          } else if (price > 0.27) {
+                            return 'var(--red)';
+                          } else if (price > 0.21) {
+                            return 'var(--orange)';
+                          } else if (price > 0.13) {
+                            return 'var(--yellow)';
+                          } else if (price > 0.08) {
+                            return 'var(--blue)';
+                          } else {
+                            return 'var(--green)';
+                          }
+                        ]]]
+                  img_cell:
+                    - justify-self: start
+                    - width: 45px
+                    - height: 45px
+                    - background: var(--contrast1)
+                    - border-radius: 50%
+                    - margin-left: 7px
+                  label:
+                    - justify-self: start
+                    - font-size: 18px
+                    - padding-top: 4px
+                    - font-weight: 500
+                    - color: var(--contrast20)
+                  card:
+                    - height: 66px
+                    - border-radius: 24px
+                    - padding: 4px 20px 4px 4px
+                    - background: var(--contrast2)
+                  name:
+                    - justify-self: start
+                    - font-size: 11px
+                    - color: var(--contrast20)
+                    - opacity: 0.7
+                    - padding-bottom: 7px
+                    - overflow: visible
+                    - white-space: normal
+                    - word-wrap: break-word
+      - type: grid
+        cards:
+          - type: heading
+            heading: Price Controls
+            heading_style: title
+            icon: mdi:tune
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - type: custom:button-card
+                template: custom_card_slider
+                entity: input_number.min_price
+                name: Min Price
+                icon: mdi:arrow-down-circle
+                variables:
+                  unit: ' ct/kWh'
+                  precision: 1
+              - type: custom:button-card
+                template: custom_card_slider
+                entity: input_number.max_price
+                name: Max Price
+                icon: mdi:arrow-up-circle
+                variables:
+                  unit: ' ct/kWh'
+                  precision: 1
+          - type: custom:decluttering-card
+            template: shared_navbar
+      - type: grid
+        cards:
+          - type: heading
+            heading: Energy Analytics
+            heading_style: title
+            icon: mdi:chart-line
+          - type: custom:apexcharts-card
+            header:
+              show: false
+              show_states: false
+            graph_span: 24h
+            span:
+              start: hour
+              offset: '-23h'
+            all_series_config:
+              group_by:
+                duration: 1h
+            series:
+              - entity: sensor.current_energy_price_eur
+                name: Energy Price
+                type: area
+                color: 'var(--red)'
+                stroke_width: 3
+                float_precision: 2
+                unit: €/kWh
+                yaxis_id: left
+                curve: stepline
+                show:
+                  extremas: true
+                group_by:
+                  duration: 1h
+                  func: last
+                transform: return x * 100;
+                fill_raw: last
+              - entity: sensor.shellypro3em_2cbcbba6f604_total_active_energy
+                name: Energy Consumption
+                type: column
+                color: 'var(--blue)'
+                opacity: 0.6
+                stroke_width: 1
+                float_precision: 2
+                unit: kWh
+                yaxis_id: right
+                show:
+                  extremas: true
+                group_by:
+                  duration: 1h
+                  func: diff
+            apex_config:
+              chart:
+                type: line
+                height: 350
+                background: transparent
+                stacked: false
+                toolbar:
+                  show: false
+                zoom:
+                  enabled: false
+                dropShadow:
+                  enabled: true
+                  top: 2
+                  left: 2
+                  blur: 4
+                  opacity: 0.2
+              plotOptions:
+                bar:
+                  columnWidth: 90%
+                  borderRadius: 0
+                  rangeBarOverlap: false
+                  distributed: false
+                  dataLabels:
+                    position: 'center'
+                area:
+                  fillTo: 'origin'
+              stroke:
+                colors:
+                  - 'var(--red)'
+                  - 'var(--blue)'
+                width:
+                  - 3
+                  - 1
+              grid:
+                borderColor: 'var(--contrast6)'
+                strokeDashArray: 2
+              xaxis:
+                type: datetime
+                labels:
+                  style:
+                    fontSize: 11px
+                    colors: 'var(--contrast15)'
+                axisBorder:
+                  show: false
+                axisTicks:
+                  show: false
+                crosshairs:
+                  show: true
+                  position: 'back'
+              yaxis:
+                - id: left
+                  title:
+                    text: ''
+                  opposite: false
+                  labels:
+                    style:
+                      colors: 'var(--contrast12)'
+                    formatter: |
+                      EVAL:function(value) {
+                        return value.toFixed(2);
+                      }
+                - id: right
+                  title:
+                    text: ''
+                  labels:
+                    style:
+                      colors: 'var(--contrast12)'
+                    formatter: |
+                      EVAL:function(value) {
+                        return value.toFixed(2);
+                      }
+                  opposite: true
+              tooltip:
+                shared: true
+                intersect: false
+                custom: |
+                  EVAL:function({series, seriesIndex, dataPointIndex, w}) {
+                    var energyPrice = series[0][dataPointIndex];
+                    var energyConsumption = series[1][dataPointIndex];
+
+                    return '<div style="padding: 10px; background: var(--contrast2); border-radius: 8px; color: var(--contrast20);">' +
+                           '<div><strong>Energy Price:</strong> ' + (energyPrice ? energyPrice.toFixed(2) + ' ct/kWh' : 'N/A') + '</div>' +
+                           '<div><strong>Energy Consumption:</strong> ' + (energyConsumption ? energyConsumption.toFixed(2) + ' kWh' : 'N/A') + '</div>' +
+                           '</div>';
+                  }
+              annotations:
+                yaxis:
+                  - y: 'max'
+                    yAxisIndex: 0
+                    borderColor: 'transparent'
+                    label:
+                      borderColor: 'transparent'
+                      style:
+                        background: 'transparent'
+                        color: 'var(--contrast12)'
+                        fontSize: '11px'
+                      text: 'ct/kWh'
+                      position: 'left'
+                      offsetX: 25
+                      offsetY: 35
+                  - y: 'max'
+                    yAxisIndex: 1
+                    borderColor: 'transparent'
+                    label:
+                      borderColor: 'transparent'
+                      style:
+                        background: 'transparent'
+                        color: 'var(--contrast12)'
+                        fontSize: '11px'
+                      text: 'kWh'
+                      position: 'right'
+                      offsetX: 15
+                      offsetY: 35
+              legend:
+                show: false
+            card_mod:
+              style: |
+                ha-card {
+                  background: var(--contrast2);
+                  border-radius: var(--ha-card-border-radius);
+                  box-shadow: 0 2px 4px rgba(var(--contrast1-RGB), 0.1);
+                }
+        column_span: 3

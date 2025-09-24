@@ -1,0 +1,514 @@
+views:
+  - title: Ülevaade
+    sections:
+      - type: grid
+        cards:
+          - type: custom:weather-card
+            entity: weather.ilm_lepiksaare
+            current: true
+            details: false
+            hourly_forecast: false
+            forecast: true
+            forecast_type: daily
+            number_of_forecasts: 5
+            name: Taritu
+          - type: custom:mushroom-template-card
+            primary: Maja kaamera
+            secondary: Live Feed
+            icon: mdi:cctv
+            entity: camera.maja_kaamera_fluent
+            tap_action:
+              action: more-info
+            layout: vertical
+          - type: custom:mushroom-light-card
+            entity: light.maja_kaamera_floodlight
+            fill_container: false
+            layout: vertical
+          - type: custom:mushroom-light-card
+            entity: light.suure_toa_soogilaua_tuled
+            fill_container: false
+            layout: vertical
+          - type: custom:mushroom-media-player-card
+            entity: media_player.suure_toa_tv
+            layout: vertical
+          - type: custom:mushroom-light-card
+            entity: switch.nutipistik_1
+            name: Köögi LED
+            icon: mdi:led-strip-variant
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: custom:mushroom-light-card
+            entity: light.shellydimmer2_ec64c9c66f3d
+            name: Pööningutoa spotid
+            icon: mdi:led-strip-variant
+            grid_options:
+              columns: 6
+              rows: 1
+            use_light_color: false
+          - type: custom:mushroom-light-card
+            entity: light.shellydimmer2_ec64c9c66cdd
+            icon: mdi:ceiling-light-multiple-outline
+            name: Pööningutoa ripplambid
+            grid_options:
+              columns: 6
+              rows: 1
+            show_brightness_control: false
+            collapsible_controls: true
+          - type: custom:mushroom-light-card
+            entity: light.shellydimmer2_ec64c9c4d1f4
+            name: Pööningutoa LED
+            icon: mdi:lightbulb-spot
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:mushroom-light-card
+            entity: light.h619a
+            name: Arvutikapi LED
+            icon: mdi:lightbulb
+            grid_options:
+              columns: 6
+              rows: 1
+            show_brightness_control: true
+            show_color_temp_control: true
+            collapsible_controls: true
+            show_color_control: true
+            tap_action:
+              action: more-info
+            use_light_color: true
+          - type: custom:mushroom-climate-card
+            entity: climate.mill_heatergen3panel
+            fill_container: false
+            show_temperature_control: true
+            collapsible_controls: false
+            tap_action:
+              action: more-info
+            primary_info: name
+            secondary_info: state
+            hvac_modes: []
+            grid_options:
+              columns: full
+            layout: horizontal
+          - type: custom:mushroom-climate-card
+            entity: climate.mill_heatergen3panel_2
+            fill_container: false
+            show_temperature_control: true
+            collapsible_controls: false
+            tap_action:
+              action: more-info
+            primary_info: name
+            secondary_info: state
+            hvac_modes: []
+            grid_options:
+              columns: full
+            layout: horizontal
+          - type: custom:mushroom-climate-card
+            entity: climate.mitsubishi_pump
+            show_temperature_control: true
+            layout: horizontal
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-template-card
+            icon: mdi:flash
+            primary: Päevane energia tarbimine
+            secondary: |
+              {% set energy = states('sensor.daily_energy') | float %}
+              {% set price = states('sensor.daily_energy_cost') | float %}
+              {{ energy | round(3) }} kWh
+              / {{ price | round(2) }} €
+            layout: horizontal
+            card_mod:
+              style: |
+                ha-card {
+                  background-color: var(--ha-card-background);
+                  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+                }
+          - type: vertical-stack
+            cards:
+              - type: custom:apexcharts-card
+                header:
+                  show: true
+                  title: Elektrihind ja voolutarbimine
+                  show_states: true
+                graph_span: 24h
+                span:
+                  start: hour
+                  offset: '-23h'
+                all_series_config:
+                  group_by:
+                    duration: 1h
+                series:
+                  - entity: sensor.current_energy_price_eur
+                    name: Elektrihind koos tasudega
+                    type: area
+                    color: rgb(44, 62, 80)
+                    stroke_width: 4
+                    float_precision: 3
+                    unit: senti/kWh
+                    yaxis_id: left
+                    curve: stepline
+                    show:
+                      extremas: true
+                    group_by:
+                      duration: 1h
+                      func: last
+                    transform: return x * 100;
+                  - entity: sensor.shellypro3em_2cbcbba6f604_total_active_power
+                    name: Tarbimine tunnis
+                    type: column
+                    color: rgb(192, 57, 43)
+                    opacity: 0.9
+                    stroke_width: 0.2
+                    float_precision: 3
+                    unit: kWh
+                    yaxis_id: right
+                    show:
+                      extremas: true
+                    group_by:
+                      duration: 1h
+                      func: avg
+                apex_config:
+                  chart:
+                    type: line
+                  xaxis:
+                    type: datetime
+                  yaxis:
+                    - id: left
+                      title:
+                        text: Elektrihind (senti/kWh)
+                      opposite: false
+                      labels:
+                        formatter: |
+                          EVAL:function(value) {
+                            return value.toFixed(2);
+                          }
+                    - id: right
+                      title:
+                        text: Tarbimine tunnis (kWh)
+                      labels:
+                        formatter: |
+                          EVAL:function(value) {
+                            return value.toFixed(2);
+                          }
+                      opposite: true
+              - type: entities
+                title: Kliima elektrihinna alusel
+                entities:
+                  - entity: input_boolean.away_mode
+                    name: Äraoleku režiim
+                  - entity: input_number.min_temp
+                    name: Minimaalne temperatuur
+                  - entity: input_number.max_temp
+                    name: Maksimaalne temperatuur
+                  - entity: input_number.min_price
+                    name: Minimaalne elektrihind
+                  - entity: input_number.max_price
+                    name: Maksimaalne elektrihind
+        column_span: 1
+    cards: []
+    badges: []
+    type: sections
+    max_columns: 4
+  - type: sections
+    max_columns: 4
+    title: Õhukvaliteet
+    path: air-quality
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:home-roof
+            heading: Pööningutuba
+            heading_style: title
+          - type: custom:mushroom-template-card
+            primary: Temperatuur (°C)
+            entity: sensor.ag_one_temperature
+            icon: mdi:thermometer
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_temperature')|float <= 18 %}
+                blue
+              {% elif states('sensor.ag_one_temperature')|float <= 24 %}
+                green
+              {% elif states('sensor.ag_one_temperature')|float <= 30 %}
+                yellow
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_temperature') }}°C -
+              {% if states('sensor.ag_one_temperature')|float <= 18 %}
+                Külm
+              {% elif states('sensor.ag_one_temperature')|float <= 24 %}
+                Paras
+              {% elif states('sensor.i_9psl_temperature')|float <= 30 %}
+                ag_one_temperature
+              {% else %}
+                Kuum
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: Õhuniiskus (%)
+            entity: sensor.ag_one_humidity
+            icon: mdi:water-percent
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_humidity')|float <= 30 %}
+                blue
+              {% elif states('sensor.ag_one_humidity')|float <= 40 %}
+                green
+              {% elif states('sensor.ag_one_humidity')|float <= 60 %}
+                green
+              {% elif states('sensor.ag_one_humidity')|float <= 80 %}
+                yellow
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_humidity') }}% -
+              {% if states('sensor.ag_one_humidity')|float <= 30 %}
+                Väga kuiv
+              {% elif states('sensor.ag_one_humidity')|float <= 40 %}
+                Nats liiga kuiv
+              {% elif states('sensor.ag_one_humidity')|float <= 60 %}
+                Paras
+              {% elif states('sensor.ag_one_humidity')|float <= 80 %}
+                Niiske
+              {% else %}
+                Liige niiske
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: CO₂ Tase
+            entity: sensor.ag_one_carbon_dioxide
+            icon: mdi:molecule-co2
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_carbon_dioxide')|int <= 800 %}
+                green
+              {% elif states('sensor.ag_one_carbon_dioxide')|int <= 1000 %}
+                yellow
+              {% elif states('sensor.ag_one_carbon_dioxide')|int <= 1500 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_carbon_dioxide') }} ppm -
+              {% if states('sensor.ag_one_carbon_dioxide')|int <= 800 %}
+                Väga hea
+              {% elif states('sensor.ag_one_carbon_dioxide')|int <= 1000 %}
+                Hea
+              {% elif states('sensor.ag_one_carbon_dioxide')|int <= 1500 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: VOC Indeks (Õhus Leiduvad Kemikaalid)
+            entity: sensor.ag_one_voc_index
+            icon: mdi:chemical-weapon
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_voc_index')|float <= 100 %}
+                green
+              {% elif states('sensor.ag_one_voc_index')|float <= 250 %}
+                yellow
+              {% elif states('sensor.ag_one_voc_index')|float <= 375 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_voc_index') }} -
+              {% if states('sensor.ag_one_voc_index')|float <= 100 %}
+                Väga hea
+              {% elif states('sensor.ag_one_voc_index')|float <= 250 %}
+                Hea
+              {% elif states('sensor.ag_one_voc_index')|float <= 375 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: NOx Indeks (Heitgaasid)
+            entity: sensor.ag_one_nox_index
+            icon: mdi:cloud-outline
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_nox_index')|float <= 20 %}
+                green
+              {% elif states('sensor.ag_one_nox_index')|float <= 50 %}
+                yellow
+              {% elif states('sensor.ag_one_nox_index')|float <= 100 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_nox_index') }} -
+              {% if states('sensor.ag_one_nox_index')|float <= 20 %}
+                Väga hea
+              {% elif states('sensor.ag_one_nox_index')|float <= 50 %}
+                Hea
+              {% elif states('sensor.ag_one_nox_index')|float <= 100 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: Ultrapeened Osakesed Õhus (PM0.3)
+            entity: sensor.ag_one_pm0_3
+            icon: mdi:cloud-outline
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_pm0_3')|float <= 50 %}
+                green
+              {% elif states('sensor.ag_one_pm0_3')|float <= 100 %}
+                yellow
+              {% elif states('sensor.ag_one_pm0_3')|float <= 150 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_pm0_3') }} kokku -
+              {% if states('sensor.ag_one_pm0_3')|float <= 50 %}
+                Väga hea
+              {% elif states('sensor.ag_one_pm0_3')|float <= 100 %}
+                Hea
+              {% elif states('sensor.ag_one_pm0_3')|float <= 150 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: Peen Tolm Õhus (PM1)
+            entity: sensor.ag_one_pm1
+            icon: mdi:cloud-outline
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_pm1')|float <= 12 %}
+                green
+              {% elif states('sensor.ag_one_pm1')|float <= 35 %}
+                yellow
+              {% elif states('sensor.ag_one_pm1')|float <= 55 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_pm1') }} μg/m³ -
+              {% if states('sensor.ag_one_pm1')|float <= 12 %}
+                Väga hea
+              {% elif states('sensor.ag_one_pm1')|float <= 35 %}
+                Hea
+              {% elif states('sensor.ag_one_pm1')|float <= 55 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: Peen Tolm & Õhusaaste (PM2.5)
+            entity: sensor.ag_one_pm2_5
+            icon: mdi:cloud-outline
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_pm2_5')|float <= 12 %}
+                green
+              {% elif states('sensor.ag_one_pm2_5')|float <= 35 %}
+                yellow
+              {% elif states('sensor.ag_one_pm2_5')|float <= 55 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_pm2_5') }} μg/m³ -
+              {% if states('sensor.ag_one_pm2_5')|float <= 12 %}
+                Väga hea
+              {% elif states('sensor.ag_one_pm2_5')|float <= 35 %}
+                Hea
+              {% elif states('sensor.ag_one_pm2_5')|float <= 55 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false
+          - type: custom:mushroom-template-card
+            primary: Suuremad Tolmuosakesed Õhus (PM10)
+            entity: sensor.ag_one_pm10
+            icon: mdi:cloud-outline
+            layout: horizontal
+            icon_color: |
+              {% if states('sensor.ag_one_pm10')|float <= 12 %}
+                green
+              {% elif states('sensor.ag_one_pm10')|float <= 35 %}
+                yellow
+              {% elif states('sensor.ag_one_pm10')|float <= 55 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            secondary: |
+              {{ states('sensor.ag_one_pm10') }} μg/m³ -
+              {% if states('sensor.ag_one_pm10')|float <= 12 %}
+                Väga hea
+              {% elif states('sensor.ag_one_pm10')|float <= 35 %}
+                Hea
+              {% elif states('sensor.ag_one_pm10')|float <= 55 %}
+                Kehv
+              {% else %}
+                Väga kehv
+              {% endif %}
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            fill_container: false
+            multiline_secondary: false

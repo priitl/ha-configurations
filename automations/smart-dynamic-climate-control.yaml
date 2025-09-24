@@ -1,0 +1,313 @@
+alias: Smart Dynamic Climate Control
+description: Intelligent climate control with HVAC modes, fan control, and efficient on/off cycling
+triggers:
+  # Immediate triggers for price changes and user input changes
+  - entity_id:
+      - sensor.current_energy_price_eur
+      - input_number.min_price
+      - input_number.max_price
+      - input_number.living_room_temp
+      - input_number.office_temp
+      - input_number.attic_temp
+      - input_boolean.away_mode
+    trigger: state
+  # Temperature sensors and climate devices - check every 15 minutes for efficiency
+  - entity_id:
+      - weather.ilm_lepiksaare
+      - sensor.ag_one_temperature  # Attic temperature sensor
+      - climate.mill_heatergen3panel  # Office radiator state changes
+      - climate.mill_heatergen3panel_2  # Attic radiator state changes
+      - climate.mitsubishi_pump  # Living room heat pump state changes
+    trigger: state
+    for: "00:15:00"  # Wait 15 minutes after state change before triggering
+  # Periodic check for overall system efficiency
+  - trigger: time_pattern
+    minutes: "/15"  # Check every 15 minutes for efficiency
+conditions: []
+actions:
+  - choose:
+      # AWAY MODE - Minimal energy consumption
+      - conditions:
+          - condition: template
+            value_template: "{{ away_mode }}"
+        sequence:
+          # Mitsubishi - minimal operation
+          - target:
+              device_id: 03d66744855d1695848cff33a60a43d5
+            data:
+              temperature: "{{ away_temp }}"
+            action: climate.set_temperature
+          - target:
+              device_id: 03d66744855d1695848cff33a60a43d5
+            data:
+              hvac_mode: |
+                {% if is_cooling_season and outdoor_temp > 32 %}
+                  cool
+                {% elif not is_cooling_season and outdoor_temp < 5 %}
+                  heat
+                {% else %}
+                  auto
+                {% endif %}
+            action: climate.set_hvac_mode
+          - target:
+              device_id: 03d66744855d1695848cff33a60a43d5
+            data:
+              fan_mode: "1 Lowest"
+            action: climate.set_fan_mode
+          - target:
+              device_id: 03d66744855d1695848cff33a60a43d5
+            data:
+              swing_mode: "Lowest"
+            action: climate.set_swing_mode
+          # Mill radiators - off unless extreme conditions
+          - target:
+              device_id:
+                - 29113dc51f50d91328a55261fd8de2a2
+                - 15cbc96ee1ff142c5b0274eaf7f12c4e
+            data:
+              temperature: "{{ away_temp }}"
+            action: climate.set_temperature
+          - target:
+              device_id:
+                - 29113dc51f50d91328a55261fd8de2a2
+                - 15cbc96ee1ff142c5b0274eaf7f12c4e
+            data:
+              hvac_mode: |
+                {% if not is_cooling_season and outdoor_temp < 2 %}
+                  heat
+                {% else %}
+                  off
+                {% endif %}
+            action: climate.set_hvac_mode
+
+      # HOME MODE - Room-specific temperature control
+      - conditions:
+          - condition: template
+            value_template: "{{ not away_mode }}"
+        sequence:
+          - choose:
+              # Cheap electricity - optimal comfort mode
+              - conditions:
+                  - condition: template
+                    value_template: "{{ current_price < min_price }}"
+                sequence:
+                  # Mitsubishi heat pump (living room) - full featured control
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      temperature: "{{ living_room_temp }}"
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      hvac_mode: |
+                        {% if is_cooling_season %}
+                          {% if outdoor_temp > 25 %}
+                            cool
+                          {% else %}
+                            auto
+                          {% endif %}
+                        {% elif outdoor_temp < 15 %}
+                          heat
+                        {% else %}
+                          auto
+                        {% endif %}
+                    action: climate.set_hvac_mode
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      fan_mode: |
+                        {% if is_cooling_season and outdoor_temp > 28 %}
+                          3 High
+                        {% elif current_price < (min_price * 0.8) %}
+                          2 Low
+                        {% else %}
+                          1 Lowest
+                        {% endif %}
+                    action: climate.set_fan_mode
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      swing_mode: |
+                        {% if is_cooling_season %}
+                          Highest
+                        {% else %}
+                          Normal
+                        {% endif %}
+                    action: climate.set_swing_mode
+                  # Mill office radiator - efficient cycling
+                  - target:
+                      device_id: 29113dc51f50d91328a55261fd8de2a2
+                    data:
+                      temperature: "{{ office_temp }}"
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 29113dc51f50d91328a55261fd8de2a2
+                    data:
+                      hvac_mode: |
+                        {% if office_current_temp is defined and office_current_temp|float >= (office_temp|float + 0.5) %}
+                          off
+                        {% else %}
+                          heat
+                        {% endif %}
+                    action: climate.set_hvac_mode
+                  # Mill attic radiator - efficient cycling
+                  - target:
+                      device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
+                    data:
+                      temperature: "{{ attic_temp }}"
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
+                    data:
+                      hvac_mode: |
+                        {% if attic_current_temp >= (attic_temp|float + 0.5) %}
+                          off
+                        {% else %}
+                          heat
+                        {% endif %}
+                    action: climate.set_hvac_mode
+
+              # Medium/Expensive electricity - efficient energy-saving mode
+              - conditions:
+                  - condition: template
+                    value_template: "{{ current_price >= min_price }}"
+                sequence:
+                  # Mitsubishi with intelligent seasonal and price logic
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      temperature: |
+                        {% if is_cooling_season %}
+                          {% if outdoor_temp > 30 %}
+                            {{ living_room_temp }}
+                          {% elif outdoor_temp > 27 and current_price < max_price %}
+                            {{ living_room_temp + 1 }}
+                          {% else %}
+                            {{ 28 }}
+                          {% endif %}
+                        {% else %}
+                          {{ living_room_temp - (temp_reduction * price_ratio) }}
+                        {% endif %}
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      hvac_mode: |
+                        {% if current_price > max_price and not is_cooling_season %}
+                          {% if living_room_current_temp is defined and living_room_current_temp|float >= (living_room_temp|float - 1.0) %}
+                            off
+                          {% else %}
+                            heat
+                          {% endif %}
+                        {% elif is_cooling_season and outdoor_temp > 26 %}
+                          cool
+                        {% elif outdoor_temp < 12 %}
+                          heat
+                        {% else %}
+                          auto
+                        {% endif %}
+                    action: climate.set_hvac_mode
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      fan_mode: |
+                        {% if current_price > max_price %}
+                          1 Lowest
+                        {% elif is_cooling_season and outdoor_temp > 30 %}
+                          2 Low
+                        {% else %}
+                          1 Lowest
+                        {% endif %}
+                    action: climate.set_fan_mode
+                  - target:
+                      device_id: 03d66744855d1695848cff33a60a43d5
+                    data:
+                      swing_mode: |
+                        {% if is_cooling_season %}
+                          Normal
+                        {% else %}
+                          Lowest
+                        {% endif %}
+                    action: climate.set_swing_mode
+                  # Mill radiators - aggressive efficiency cycling during high prices
+                  - target:
+                      device_id: 29113dc51f50d91328a55261fd8de2a2
+                    data:
+                      temperature: "{{ office_temp - (temp_reduction * price_ratio) }}"
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 29113dc51f50d91328a55261fd8de2a2
+                    data:
+                      hvac_mode: |
+                        {% set target_temp = office_temp - (temp_reduction * price_ratio) %}
+                        {% if current_price > max_price %}
+                          {% if office_current_temp is defined and office_current_temp|float >= target_temp|float %}
+                            off
+                          {% else %}
+                            heat
+                          {% endif %}
+                        {% elif office_current_temp is defined and office_current_temp|float >= (target_temp|float + 0.3) %}
+                          off
+                        {% else %}
+                          heat
+                        {% endif %}
+                    action: climate.set_hvac_mode
+                  - target:
+                      device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
+                    data:
+                      temperature: "{{ attic_temp - (temp_reduction * price_ratio) }}"
+                    action: climate.set_temperature
+                  - target:
+                      device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
+                    data:
+                      hvac_mode: |
+                        {% set target_temp = attic_temp - (temp_reduction * price_ratio) %}
+                        {% if current_price > max_price %}
+                          {% if attic_current_temp >= target_temp|float %}
+                            off
+                          {% else %}
+                            heat
+                          {% endif %}
+                        {% elif attic_current_temp >= (target_temp|float + 0.3) %}
+                          off
+                        {% else %}
+                          heat
+                        {% endif %}
+                    action: climate.set_hvac_mode
+
+mode: queued
+variables:
+  # Price variables
+  current_price: "{{ states('sensor.current_energy_price_eur')|float }}"
+  min_price: "{{ states('input_number.min_price')|float / 100 }}"
+  max_price: "{{ states('input_number.max_price')|float / 100 }}"
+  price_ratio: "{{ ((current_price - min_price) / (max_price - min_price)) | float }}"
+
+  # Mode variables
+  away_mode: "{{ is_state('input_boolean.away_mode', 'on') }}"
+
+  # Environmental variables - automatic season detection
+  outdoor_temp: "{{ state_attr('weather.ilm_lepiksaare', 'temperature')|float }}"
+  month: "{{ now().month }}"
+  is_cooling_season: "{{ month in [6, 7, 8, 9] and outdoor_temp > 22 }}"
+
+  # Room target temperatures
+  living_room_temp: "{{ states('input_number.living_room_temp')|float }}"
+  office_temp: "{{ states('input_number.office_temp')|float }}"
+  attic_temp: "{{ states('input_number.attic_temp')|float }}"
+
+  # Current room temperatures (for efficient cycling)
+  living_room_current_temp: "{{ state_attr('climate.mitsubishi_pump', 'current_temperature')|float(0) }}"
+  office_current_temp: "{{ state_attr('climate.mill_heatergen3panel', 'current_temperature')|float(0) }}"
+  attic_current_temp: "{{ states('sensor.ag_one_temperature')|float(0) }}"
+
+  # Away mode temperature
+  away_temp: 17
+
+  # Temperature reduction based on price (max 3°C reduction)
+  temp_reduction: 3
+
+  # Hysteresis settings for efficient cycling
+  temp_hysteresis: 0.5  # Temperature buffer to prevent frequent on/off cycling
+  expensive_hysteresis: 0.3  # Tighter control during expensive periods

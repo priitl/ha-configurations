@@ -1,0 +1,117 @@
+# Home Assistant
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets and sensitive data
+secrets.yaml
+known_devices.yaml
+*.pem
+*.key
+*.crt
+*.p12
+
+# Home Assistant directories
+.storage/
+deps/
+tts/
+www/
+.cloud/
+.google.token
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Configuration backups
+*.yaml.bak
+*.yml.bak
+
+# Home Assistant specific
+home-assistant_v2.db*
+home-assistant.log*
+OZW_Log.txt
+*.uuid
+ip_bans.yaml
+
+# Custom component development
+custom_components/**/__pycache__/
+custom_components/**/*.pyc
+
+# HACS
+custom_components/hacs/
+
+# Node.js (if using Node-RED or similar)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SSH keys
+*.pub
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# SSL certificates
+*.csr
+*.der
+*.pfx
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Personal notes and temporary files
+notes.txt
+TODO.md
+temp/
+tmp/
