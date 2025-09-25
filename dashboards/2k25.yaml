@@ -1412,9 +1412,9 @@ views:
                       if (Math.abs(diff) < 1) {
                         diffText = 'Matches daily average';
                       } else if (diff > 0) {
-                        diffText = `${diff.toFixed(0)}% above daily avg (${avgPrice.toFixed(2)} €)`;
+                        diffText = `${diff.toFixed(0)}% above daily average of ${avgPrice.toFixed(2)} €`;
                       } else {
-                        diffText = `${Math.abs(diff).toFixed(0)}% below daily avg (${avgPrice.toFixed(2)}) €`;
+                        diffText = `${Math.abs(diff).toFixed(0)}% below daily average of ${avgPrice.toFixed(2)} €`;
                       }
                       return `${diffText}`;
                     ]]]
@@ -1494,24 +1494,27 @@ views:
                 variables:
                   state: |
                     [[[
-                      var lowestPrice = parseFloat(states['sensor.nord_pool_ee_lowest_price'].state);
                       var startTime = states['sensor.nord_pool_ee_lowest_price'].attributes.start;
                       var endTime = states['sensor.nord_pool_ee_lowest_price'].attributes.end;
                       if (startTime && endTime) {
                         var start = new Date(startTime).getHours();
                         var end = new Date(endTime).getHours();
-                        return `${start}:00-${end}:00 (${lowestPrice.toFixed(2)} €)`;
+                        return `Best time ${start}:00 - ${end}:00`;
                       } else {
-                        return `${lowestPrice.toFixed(2)} €/kWh`;
+                        return 'Best time for consumption';
                       }
                     ]]]
-                  secondary: "Best time for high energy consumption"
+                  secondary: |
+                    [[[
+                      var lowestPrice = parseFloat(states['sensor.nord_pool_ee_lowest_price'].state);
+                      return `Lowest price of the day at ${lowestPrice.toFixed(2)} €`;
+                    ]]]
                 show_label: true
                 show_name: true
                 show_icon: true
                 label: '[[[ return variables.state ]]]'
                 name: '[[[ return variables.secondary ]]]'
-                icon: mdi:arrow-down-circle
+                icon: mdi:clock-check
                 styles:
                   grid:
                     - grid-template-columns: 62px 1fr
@@ -1550,24 +1553,27 @@ views:
                 variables:
                   state: |
                     [[[
-                      var highestPrice = parseFloat(states['sensor.nord_pool_ee_highest_price'].state);
                       var startTime = states['sensor.nord_pool_ee_highest_price'].attributes.start;
                       var endTime = states['sensor.nord_pool_ee_highest_price'].attributes.end;
                       if (startTime && endTime) {
                         var start = new Date(startTime).getHours();
                         var end = new Date(endTime).getHours();
-                        return `${start}:00-${end}:00 (${highestPrice.toFixed(2)} €)`;
+                        return `Worst time ${start}:00 - ${end}:00`;
                       } else {
-                        return `${highestPrice.toFixed(2)} €/kWh`;
+                        return 'Worst time for consumption';
                       }
                     ]]]
-                  secondary: "Avoid high energy consumption at this time"
+                  secondary: |
+                    [[[
+                      var highestPrice = parseFloat(states['sensor.nord_pool_ee_highest_price'].state);
+                      return `Highest price of the day at ${highestPrice.toFixed(2)} €`;
+                    ]]]
                 show_label: true
                 show_name: true
                 show_icon: true
                 label: '[[[ return variables.state ]]]'
                 name: '[[[ return variables.secondary ]]]'
-                icon: mdi:arrow-up-circle
+                icon: mdi:close-circle
                 styles:
                   grid:
                     - grid-template-columns: 62px 1fr
