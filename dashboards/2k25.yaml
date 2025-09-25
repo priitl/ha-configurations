@@ -140,6 +140,11 @@ button_card_templates:
             [[[ return variables.light_entities && variables.light_entities[0] ?
             (variables.light_entities[0].icon || "mdi:lightbulb") :
             "mdi:lightbulb" ]]]
+          state:
+            - value: "on"
+              styles:
+                icon:
+                  - color: "#FFDA78"
           styles:
             card:
               - display: >-
@@ -152,9 +157,7 @@ button_card_templates:
               - height: 32px
               - box-shadow: none
             icon:
-              - color: >-
-                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
-                  "#6f6f6f" ]]]
+              - color: "#6f6f6f"
               - width: 18px
           tap_action:
             action: toggle
@@ -172,6 +175,11 @@ button_card_templates:
             [[[ return variables.light_entities && variables.light_entities[1] ?
             (variables.light_entities[1].icon || "mdi:lightbulb") :
             "mdi:lightbulb" ]]]
+          state:
+            - value: "on"
+              styles:
+                icon:
+                  - color: "#FFDA78"
           styles:
             card:
               - display: >-
@@ -184,9 +192,7 @@ button_card_templates:
               - height: 32px
               - box-shadow: none
             icon:
-              - color: >-
-                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
-                  "#6f6f6f" ]]]
+              - color: "#6f6f6f"
               - width: 18px
           tap_action:
             action: toggle
@@ -204,6 +210,11 @@ button_card_templates:
             [[[ return variables.light_entities && variables.light_entities[2] ?
             (variables.light_entities[2].icon || "mdi:lightbulb") :
             "mdi:lightbulb" ]]]
+          state:
+            - value: "on"
+              styles:
+                icon:
+                  - color: "#FFDA78"
           styles:
             card:
               - display: >-
@@ -216,9 +227,7 @@ button_card_templates:
               - height: 32px
               - box-shadow: none
             icon:
-              - color: >-
-                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
-                  "#6f6f6f" ]]]
+              - color: "#6f6f6f"
               - width: 18px
           tap_action:
             action: toggle
@@ -830,9 +839,9 @@ views:
                 template: custom_card_room_sensor
                 variables:
                   room_name: Pööningutuba
-                  temp_entity: climate.mill_heatergen3panel_2
-                  humidity_entity: ''
-                  co2_entity: sensor.attic_co2
+                  temp_entity: sensor.ag_one_temperature
+                  humidity_entity: sensors.ag_one_humidity
+                  co2_entity: sensor.ag_one_carbon_dioxide
                   icon: mdi:home-roof
                   target_temp_entity: input_number.attic_temp
                   light_entities:
@@ -884,7 +893,7 @@ views:
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
-                  room_name: Vasja Tuba
+                  room_name: Vasja Köök
                   temp_entity: sensor.esp32_vasja_tuba_sht41_temperature
                   humidity_entity: sensor.esp32_vasja_tuba_sht41_humidity
                   co2_entity: sensor.esp32_vasja_tuba_co2
