@@ -696,6 +696,52 @@ views:
             visibility:
               - condition: screen
                 media_query: '(min-width: 0px) and (max-width: 767px)'
+          - type: custom:button-card
+            entity: input_text.ai_weather_report
+            show_label: true
+            show_name: false
+            show_icon: true
+            label: |
+              [[[
+                return states['input_text.ai_weather_report'].state
+              ]]]
+            icon: mdi:newspaper-variant-outline
+            styles:
+              grid:
+                - grid-template-columns: 50px 1fr
+                - grid-template-areas: '"i l" "i l"'
+                - grid-template-rows: auto auto
+                - align-content: center
+                - gap: 2px
+              icon:
+                - width: 24px
+                - color: '#6f6f6f'
+              img_cell:
+                - justify-self: start
+                - width: 36px
+                - height: 36px
+                - background: '#242529'
+                - border-radius: 50%
+                - margin-left: 10px
+                - align-self: center
+              label:
+                - justify-self: start
+                - font-size: 12px
+                - color: var(--contrast14)
+                - font-weight: 500
+                - align-self: center
+                - line-height: 1.4
+                - margin-left: 4px
+                - text-overflow: unset
+                - overflow: visible
+                - white-space: normal
+                - word-wrap: break-word
+                - text-align: left
+              card:
+                - height: 100px
+                - border-radius: 24px
+                - padding: 4px 20px 4px 4px
+                - background: var(--contrast2)
           - type: heading
             heading: Rooms
             heading_style: title

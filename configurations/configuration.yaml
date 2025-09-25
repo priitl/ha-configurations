@@ -208,6 +208,11 @@ input_number:
     unit_of_measurement: "°C"
     initial: 19
 
+input_text:
+  ai_weather_report:
+    name: AI Weather Report
+    max: 255
+
 input_boolean:
   away_mode:
     name: Äraoleku režiim
