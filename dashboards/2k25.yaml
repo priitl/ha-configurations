@@ -383,89 +383,6 @@ button_card_templates:
         - color: var(--contrast20)
         - opacity: 0.7
         - padding-bottom: 7px
-  custom_card_slider:
-    template: setup
-    tap_action:
-      action: none
-    variables:
-      state: |
-        [[[
-          var st = states[entity.entity_id].state;
-          var uni = variables.unit || ' ct/kWh';
-          var precision = variables.precision || 1;
-          return `
-          ${parseFloat(st).toFixed(precision)}<span style="font-size:
-        0.5em;opacity:0.7">${uni}</span>
-          `
-        ]]]
-    show_label: true
-    label: '[[[ return variables.state ]]]'
-    custom_fields:
-      slider:
-        card:
-          type: custom:my-slider-v2
-          entity: '[[[ return entity.entity_id ]]]'
-          mode: position
-          step: 0.1
-          styles:
-            container:
-              - background: none
-              - border-radius: 100px
-              - overflow: visible
-            card:
-              - height: 24px
-              - padding: 0 8px
-              - background: var(--contrast6)
-            track:
-              - overflow: visible
-              - background: none
-            progress:
-              - background: none
-            thumb:
-              - background: var(--contrast12)
-              - top: 2px
-              - right: '-8px'
-              - height: 20px
-              - width: 20px
-              - border-radius: 10px
-    styles:
-      grid:
-        - grid-template-columns: 62px 1fr
-        - grid-template-areas: '"i l" "i n" "slider slider"'
-        - grid-template-rows: auto auto auto
-      icon:
-        - width: 24px
-        - color: var(--contrast20)
-      img_cell:
-        - justify-self: start
-        - width: 45px
-        - height: 45px
-        - background: var(--contrast1)
-        - border-radius: 50%
-        - margin-left: 7px
-        - grid-area: i
-      label:
-        - justify-self: start
-        - font-size: 20px
-        - padding-top: 4px
-        - font-weight: 500
-        - color: var(--contrast20)
-        - grid-area: l
-      card:
-        - height: 100px
-        - border-radius: 24px
-        - padding: 4px 20px 4px 4px
-        - background: var(--contrast2)
-      name:
-        - justify-self: start
-        - font-size: 11px
-        - color: var(--contrast20)
-        - opacity: 0.7
-        - padding-bottom: 7px
-        - grid-area: 'n'
-      custom_fields:
-        slider:
-          - padding-left: 16px
   custom_card_user:
     template: setup
     show_entity_picture: false
@@ -1233,7 +1150,7 @@ views:
               - type: custom:button-card
                 template: custom_card_sensor_medium
                 entity: sensor.shellypro3em_2cbcbba6f604_total_active_power
-                name: Power Current
+                name: Current Power
                 icon: mdi:lightning-bolt
                 variables:
                   state: |
@@ -1615,25 +1532,39 @@ views:
             heading_style: title
             icon: mdi:tune
           - square: false
-            columns: 2
+            columns: 1
             type: grid
             cards:
               - type: custom:button-card
-                template: custom_card_slider
+                template: custom_card_room_sensor
                 entity: input_number.min_price
                 name: Min Price
                 icon: mdi:arrow-down-circle
                 variables:
-                  unit: ' ct/kWh'
-                  precision: 1
+                  target_temp_entity: input_number.min_price
+                label: |
+                  [[[
+                    var state = states['input_number.min_price'];
+                    if (state && state.state) {
+                      return `${parseFloat(state.state).toFixed(1)} ct/kWh`;
+                    }
+                    return 'N/A';
+                  ]]]
               - type: custom:button-card
-                template: custom_card_slider
+                template: custom_card_room_sensor
                 entity: input_number.max_price
                 name: Max Price
                 icon: mdi:arrow-up-circle
                 variables:
-                  unit: ' ct/kWh'
-                  precision: 1
+                  target_temp_entity: input_number.max_price
+                label: |
+                  [[[
+                    var state = states['input_number.max_price'];
+                    if (state && state.state) {
+                      return `${parseFloat(state.state).toFixed(1)} ct/kWh`;
+                    }
+                    return 'N/A';
+                  ]]]
           - type: custom:decluttering-card
             template: shared_navbar
       - type: grid
