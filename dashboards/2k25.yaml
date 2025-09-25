@@ -525,7 +525,7 @@ button_card_templates:
               - background: none
               - box-shadow: none
               - z-index: 5
-              - margin-left: 120px
+              - margin-left: 60px
             entity_picture:
               - width: 40px
               - height: 40px
@@ -557,7 +557,70 @@ button_card_templates:
               - background: none
               - box-shadow: none
               - z-index: 4
-              - margin-left: 100px
+              - margin-left: 40px
+            entity_picture:
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+            img_cell:
+              - background-color: var(--contrast1)
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+      three:
+        card:
+          type: custom:button-card
+          entity: person.ljudal
+          show_name: false
+          show_entity_picture: true
+          state:
+            - value: not_home
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+            - value: unknown
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+          styles:
+            card:
+              - background: none
+              - box-shadow: none
+              - z-index: 3
+              - margin-left: 20px
+            entity_picture:
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+            img_cell:
+              - background-color: var(--contrast1)
+              - width: 40px
+              - height: 40px
+              - border-radius: 12px
+      four:
+        card:
+          type: custom:button-card
+          entity: person.riinal
+          show_name: false
+          show_entity_picture: true
+          state:
+            - value: not_home
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+            - value: unknown
+              styles:
+                entity_picture:
+                  - filter: grayscale(100%)
+                  - opacity: 0.5
+          styles:
+            card:
+              - background: none
+              - box-shadow: none
+              - z-index: 2
             entity_picture:
               - width: 40px
               - height: 40px
@@ -1369,7 +1432,7 @@ views:
                   secondary: |
                     [[[
                       var currentPrice = parseFloat(states['sensor.current_energy_price_eur'].state);
-                      var avgPrice = parseFloat(states['sensor.nord_pool_ee_daily_average'].state);
+                      var avgPrice = parseFloat(states['sensor.daily_average_energy_price_eur'].state);
                       var diff = ((currentPrice - avgPrice) / avgPrice * 100);
                       var diffText = '';
                       if (Math.abs(diff) < 1) {
@@ -1469,8 +1532,8 @@ views:
                     ]]]
                   secondary: |
                     [[[
-                      var lowestPrice = parseFloat(states['sensor.nord_pool_ee_lowest_price'].state);
-                      return `Lowest price of the day at ${lowestPrice.toFixed(2)} €`;
+                      var lowestPrice = parseFloat(states['sensor.lowest_energy_price_eur'].state);
+                      return `Lowest price of the day at ${lowestPrice.toFixed(2)} €/kWh`;
                     ]]]
                 show_label: true
                 show_name: true
@@ -1528,8 +1591,8 @@ views:
                     ]]]
                   secondary: |
                     [[[
-                      var highestPrice = parseFloat(states['sensor.nord_pool_ee_highest_price'].state);
-                      return `Highest price of the day at ${highestPrice.toFixed(2)} €`;
+                      var highestPrice = parseFloat(states['sensor.highest_energy_price_eur'].state);
+                      return `Highest price of the day at ${highestPrice.toFixed(2)} €/kWh`;
                     ]]]
                 show_label: true
                 show_name: true
