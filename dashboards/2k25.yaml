@@ -60,7 +60,9 @@ button_card_templates:
   custom_card_room_sensor:
     triggers_update:
       - '[[[ return variables.target_temp_entity ]]]'
-      - '[[[ return variables.light_entities ? variables.light_entities.map(l => l.entity).join(",") : "" ]]]'
+      - >-
+        [[[ return variables.light_entities ? variables.light_entities.map(l =>
+        l.entity).join(",") : "" ]]]
       - '[[[ return variables.temp_entity ]]]'
       - '[[[ return variables.humidity_entity ]]]'
       - '[[[ return variables.co2_entity ]]]'
@@ -129,20 +131,30 @@ button_card_templates:
       light1:
         card:
           type: custom:button-card
-          entity: '[[[ return variables.light_entities && variables.light_entities[0] ? variables.light_entities[0].entity : "" ]]]'
+          entity: >-
+            [[[ return variables.light_entities && variables.light_entities[0] ?
+            variables.light_entities[0].entity : "" ]]]
           show_name: false
           show_state: false
-          icon: '[[[ return variables.light_entities && variables.light_entities[0] ? (variables.light_entities[0].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          icon: >-
+            [[[ return variables.light_entities && variables.light_entities[0] ?
+            (variables.light_entities[0].icon || "mdi:lightbulb") :
+            "mdi:lightbulb" ]]]
           styles:
             card:
-              - display: '[[[ return variables.light_entities && variables.light_entities.length > 0 && variables.light_entities[0] ? "block" : "none" ]]]'
+              - display: >-
+                  [[[ return variables.light_entities &&
+                  variables.light_entities.length > 0 &&
+                  variables.light_entities[0] ? "block" : "none" ]]]
               - background: transparent
               - border-radius: 12px
               - width: 32px
               - height: 32px
               - box-shadow: none
             icon:
-              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - color: >-
+                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
+                  "#6f6f6f" ]]]
               - width: 18px
           tap_action:
             action: toggle
@@ -151,20 +163,30 @@ button_card_templates:
       light2:
         card:
           type: custom:button-card
-          entity: '[[[ return variables.light_entities && variables.light_entities[1] ? variables.light_entities[1].entity : "" ]]]'
+          entity: >-
+            [[[ return variables.light_entities && variables.light_entities[1] ?
+            variables.light_entities[1].entity : "" ]]]
           show_name: false
           show_state: false
-          icon: '[[[ return variables.light_entities && variables.light_entities[1] ? (variables.light_entities[1].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          icon: >-
+            [[[ return variables.light_entities && variables.light_entities[1] ?
+            (variables.light_entities[1].icon || "mdi:lightbulb") :
+            "mdi:lightbulb" ]]]
           styles:
             card:
-              - display: '[[[ return variables.light_entities && variables.light_entities.length > 1 && variables.light_entities[1] ? "block" : "none" ]]]'
+              - display: >-
+                  [[[ return variables.light_entities &&
+                  variables.light_entities.length > 1 &&
+                  variables.light_entities[1] ? "block" : "none" ]]]
               - background: transparent
               - border-radius: 12px
               - width: 32px
               - height: 32px
               - box-shadow: none
             icon:
-              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - color: >-
+                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
+                  "#6f6f6f" ]]]
               - width: 18px
           tap_action:
             action: toggle
@@ -173,20 +195,30 @@ button_card_templates:
       light3:
         card:
           type: custom:button-card
-          entity: '[[[ return variables.light_entities && variables.light_entities[2] ? variables.light_entities[2].entity : "" ]]]'
+          entity: >-
+            [[[ return variables.light_entities && variables.light_entities[2] ?
+            variables.light_entities[2].entity : "" ]]]
           show_name: false
           show_state: false
-          icon: '[[[ return variables.light_entities && variables.light_entities[2] ? (variables.light_entities[2].icon || "mdi:lightbulb") : "mdi:lightbulb" ]]]'
+          icon: >-
+            [[[ return variables.light_entities && variables.light_entities[2] ?
+            (variables.light_entities[2].icon || "mdi:lightbulb") :
+            "mdi:lightbulb" ]]]
           styles:
             card:
-              - display: '[[[ return variables.light_entities && variables.light_entities.length > 2 && variables.light_entities[2] ? "block" : "none" ]]]'
+              - display: >-
+                  [[[ return variables.light_entities &&
+                  variables.light_entities.length > 2 &&
+                  variables.light_entities[2] ? "block" : "none" ]]]
               - background: transparent
               - border-radius: 12px
               - width: 32px
               - height: 32px
               - box-shadow: none
             icon:
-              - color: '[[[ return entity && entity.state === "on" ? "var(--yellow)" : "#6f6f6f" ]]]'
+              - color: >-
+                  [[[ return entity && entity.state === "on" ? "var(--yellow)" :
+                  "#6f6f6f" ]]]
               - width: 18px
           tap_action:
             action: toggle
@@ -222,7 +254,12 @@ button_card_templates:
           show_icon: false
           show_name: false
           show_state: true
-          state_display: '[[[ return variables.target_temp_entity && states[variables.target_temp_entity] && states[variables.target_temp_entity].state ? parseFloat(states[variables.target_temp_entity].state).toFixed(1).replace(".", ",") : "" ]]]'
+          state_display: >-
+            [[[ return variables.target_temp_entity &&
+            states[variables.target_temp_entity] &&
+            states[variables.target_temp_entity].state ?
+            parseFloat(states[variables.target_temp_entity].state).toFixed(1).replace(".",
+            ",") : "" ]]]
           styles:
             card:
               - display: '[[[ return variables.target_temp_entity ? "flex" : "none" ]]]'
@@ -264,7 +301,9 @@ button_card_templates:
     styles:
       grid:
         - grid-template-columns: 50px 1fr repeat(6, 32px)
-        - grid-template-areas: '"i n light3 light2 light1 temp_minus temp_display temp_plus" "i l light3 light2 light1 temp_minus temp_display temp_plus"'
+        - grid-template-areas: >-
+            "i n light3 light2 light1 temp_minus temp_display temp_plus" "i l
+            light3 light2 light1 temp_minus temp_display temp_plus"
         - grid-template-rows: auto auto
         - align-content: center
         - gap: 2px
@@ -459,7 +498,7 @@ button_card_templates:
             - filter: grayscale(100%)
     styles:
       card:
-        - padding: 12px 0px 12px 12px
+        - padding: 12px 12px 12px 12px
         - background: none
         - box-shadow: none
       grid:
@@ -472,6 +511,7 @@ button_card_templates:
         - font-weight: 700
         - font-size: 15px
         - padding-left: 15px
+        - padding-top: 5px
       label:
         - justify-self: start
         - align-self: start
@@ -568,7 +608,7 @@ button_card_templates:
               - background: none
               - box-shadow: none
               - z-index: 5
-              - margin-left: 60px
+              - margin-left: 120px
             entity_picture:
               - width: 40px
               - height: 40px
@@ -600,7 +640,7 @@ button_card_templates:
               - background: none
               - box-shadow: none
               - z-index: 4
-              - margin-left: 40px
+              - margin-left: 100px
             entity_picture:
               - width: 40px
               - height: 40px
@@ -893,6 +933,64 @@ views:
     badges:
       - type: custom:mushroom-template-badge
         icon: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state == 'sunny' %}
+            mdi:weather-sunny
+          {% elif weather_state == 'clear-night' %}
+            mdi:weather-night
+          {% elif weather_state == 'partlycloudy' %}
+            mdi:weather-partly-cloudy
+          {% elif weather_state == 'cloudy' %}
+            mdi:weather-cloudy
+          {% elif weather_state == 'fog' %}
+            mdi:weather-fog
+          {% elif weather_state == 'rainy' %}
+            mdi:weather-rainy
+          {% elif weather_state == 'pouring' %}
+            mdi:weather-pouring
+          {% elif weather_state == 'snowy' %}
+            mdi:weather-snowy
+          {% elif weather_state == 'snowy-rainy' %}
+            mdi:weather-snowy-rainy
+          {% elif weather_state == 'windy' %}
+            mdi:weather-windy
+          {% elif weather_state == 'hail' %}
+            mdi:weather-hail
+          {% elif weather_state == 'lightning' %}
+            mdi:weather-lightning
+          {% else %}
+            mdi:weather-partly-cloudy
+          {% endif %}
+        content: >-
+          {{ state_attr('weather.ilm_lepiksaare', 'temperature') }}°C • {{
+          state_attr('weather.ilm_lepiksaare', 'humidity') }}%
+        color: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state in ['sunny', 'clear-night'] %}
+            yellow
+          {% elif weather_state in ['partlycloudy', 'cloudy'] %}
+            grey
+          {% elif weather_state in ['rainy', 'pouring'] %}
+            blue
+          {% elif weather_state in ['snowy', 'snowy-rainy'] %}
+            light-blue
+          {% elif weather_state in ['fog'] %}
+            grey
+          {% else %}
+            orange
+          {% endif %}
+        entity: weather.ilm_lepiksaare
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-template-badge
+        icon: mdi:cctv
+        content: Camera
+        color: blue
+        entity: camera.maja_kaamera_fluent
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-template-badge
+        icon: |
           {% if is_state('input_boolean.away_mode', 'on') %}
             mdi:home-export-outline
           {% else %}
@@ -941,6 +1039,64 @@ views:
     badges:
       - type: custom:mushroom-template-badge
         icon: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state == 'sunny' %}
+            mdi:weather-sunny
+          {% elif weather_state == 'clear-night' %}
+            mdi:weather-night
+          {% elif weather_state == 'partlycloudy' %}
+            mdi:weather-partly-cloudy
+          {% elif weather_state == 'cloudy' %}
+            mdi:weather-cloudy
+          {% elif weather_state == 'fog' %}
+            mdi:weather-fog
+          {% elif weather_state == 'rainy' %}
+            mdi:weather-rainy
+          {% elif weather_state == 'pouring' %}
+            mdi:weather-pouring
+          {% elif weather_state == 'snowy' %}
+            mdi:weather-snowy
+          {% elif weather_state == 'snowy-rainy' %}
+            mdi:weather-snowy-rainy
+          {% elif weather_state == 'windy' %}
+            mdi:weather-windy
+          {% elif weather_state == 'hail' %}
+            mdi:weather-hail
+          {% elif weather_state == 'lightning' %}
+            mdi:weather-lightning
+          {% else %}
+            mdi:weather-partly-cloudy
+          {% endif %}
+        content: >-
+          {{ state_attr('weather.ilm_lepiksaare', 'temperature') }}°C • {{
+          state_attr('weather.ilm_lepiksaare', 'humidity') }}%
+        color: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state in ['sunny', 'clear-night'] %}
+            yellow
+          {% elif weather_state in ['partlycloudy', 'cloudy'] %}
+            grey
+          {% elif weather_state in ['rainy', 'pouring'] %}
+            blue
+          {% elif weather_state in ['snowy', 'snowy-rainy'] %}
+            light-blue
+          {% elif weather_state in ['fog'] %}
+            grey
+          {% else %}
+            orange
+          {% endif %}
+        entity: weather.ilm_lepiksaare
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-template-badge
+        icon: mdi:cctv
+        content: Camera
+        color: blue
+        entity: camera.maja_kaamera_fluent
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-template-badge
+        icon: |
           {% if is_state('input_boolean.away_mode', 'on') %}
             mdi:home-export-outline
           {% else %}
@@ -974,6 +1130,64 @@ views:
       badges_wrap: scroll
     max_columns: 3
     badges:
+      - type: custom:mushroom-template-badge
+        icon: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state == 'sunny' %}
+            mdi:weather-sunny
+          {% elif weather_state == 'clear-night' %}
+            mdi:weather-night
+          {% elif weather_state == 'partlycloudy' %}
+            mdi:weather-partly-cloudy
+          {% elif weather_state == 'cloudy' %}
+            mdi:weather-cloudy
+          {% elif weather_state == 'fog' %}
+            mdi:weather-fog
+          {% elif weather_state == 'rainy' %}
+            mdi:weather-rainy
+          {% elif weather_state == 'pouring' %}
+            mdi:weather-pouring
+          {% elif weather_state == 'snowy' %}
+            mdi:weather-snowy
+          {% elif weather_state == 'snowy-rainy' %}
+            mdi:weather-snowy-rainy
+          {% elif weather_state == 'windy' %}
+            mdi:weather-windy
+          {% elif weather_state == 'hail' %}
+            mdi:weather-hail
+          {% elif weather_state == 'lightning' %}
+            mdi:weather-lightning
+          {% else %}
+            mdi:weather-partly-cloudy
+          {% endif %}
+        content: >-
+          {{ state_attr('weather.ilm_lepiksaare', 'temperature') }}°C • {{
+          state_attr('weather.ilm_lepiksaare', 'humidity') }}%
+        color: |
+          {% set weather_state = states('weather.ilm_lepiksaare') %}
+          {% if weather_state in ['sunny', 'clear-night'] %}
+            yellow
+          {% elif weather_state in ['partlycloudy', 'cloudy'] %}
+            grey
+          {% elif weather_state in ['rainy', 'pouring'] %}
+            blue
+          {% elif weather_state in ['snowy', 'snowy-rainy'] %}
+            light-blue
+          {% elif weather_state in ['fog'] %}
+            grey
+          {% else %}
+            orange
+          {% endif %}
+        entity: weather.ilm_lepiksaare
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-template-badge
+        icon: mdi:cctv
+        content: Camera
+        color: blue
+        entity: camera.maja_kaamera_fluent
+        tap_action:
+          action: more-info
       - type: custom:mushroom-template-badge
         icon: |
           {% if is_state('input_boolean.away_mode', 'on') %}
@@ -1040,9 +1254,9 @@ views:
                   state: |
                     [[[
                       var st = states[entity.entity_id].state;
-                      var uni = ' ct/kWh';
+                      var uni = ' €/kWh';
                       return `
-                      ${(parseFloat(st)*100).toFixed(2)}<span style="font-size:
+                      ${parseFloat(st).toFixed(2)}<span style="font-size:
                     0.5em;opacity:0.7">${uni}</span>
                       `
                     ]]]
@@ -1174,16 +1388,16 @@ views:
                 variables:
                   state: |
                     [[[
-                      var price = parseFloat(states['sensor.current_energy_price_eur'].state);
-                      if (price > 0.40) {
+                      var currentPrice = parseFloat(states['sensor.current_energy_price_eur'].state);
+                      if (currentPrice > 0.40) {
                         return 'Extremely Expensive';
-                      } else if (price > 0.27) {
+                      } else if (currentPrice > 0.27) {
                         return 'Very Expensive';
-                      } else if (price > 0.21) {
+                      } else if (currentPrice > 0.21) {
                         return 'Expensive';
-                      } else if (price > 0.13) {
+                      } else if (currentPrice > 0.13) {
                         return 'Average Price';
-                      } else if (price > 0.08) {
+                      } else if (currentPrice > 0.08) {
                         return 'Good Price';
                       } else {
                         return 'Excellent Price';
@@ -1191,20 +1405,18 @@ views:
                     ]]]
                   secondary: |
                     [[[
-                      var price = parseFloat(states['sensor.current_energy_price_eur'].state);
-                      if (price > 0.40) {
-                        return 'Avoid heavy usage if possible';
-                      } else if (price > 0.27) {
-                        return 'Consider reducing usage';
-                      } else if (price > 0.21) {
-                        return 'Use energy wisely';
-                      } else if (price > 0.13) {
-                        return 'Normal energy usage';
-                      } else if (price > 0.08) {
-                        return 'Good time for energy tasks';
+                      var currentPrice = parseFloat(states['sensor.current_energy_price_eur'].state);
+                      var avgPrice = parseFloat(states['sensor.nord_pool_ee_daily_average'].state);
+                      var diff = ((currentPrice - avgPrice) / avgPrice * 100);
+                      var diffText = '';
+                      if (Math.abs(diff) < 1) {
+                        diffText = 'Matches daily average';
+                      } else if (diff > 0) {
+                        diffText = `${diff.toFixed(0)}% above daily avg (${avgPrice.toFixed(2)} €)`;
                       } else {
-                        return 'Perfect time for heavy usage';
+                        diffText = `${Math.abs(diff).toFixed(0)}% below daily avg (${avgPrice.toFixed(2)}) €`;
                       }
+                      return `${diffText}`;
                     ]]]
                 show_label: true
                 show_name: true
@@ -1213,16 +1425,16 @@ views:
                 name: '[[[ return variables.secondary ]]]'
                 icon: |
                   [[[
-                    var price = parseFloat(states['sensor.current_energy_price_eur'].state);
-                    if (price > 0.40) {
+                    var currentPrice = parseFloat(states['sensor.current_energy_price_eur'].state);
+                    if (currentPrice > 0.40) {
                       return 'mdi:alert-octagon';
-                    } else if (price > 0.27) {
+                    } else if (currentPrice > 0.27) {
                       return 'mdi:alert';
-                    } else if (price > 0.21) {
+                    } else if (currentPrice > 0.21) {
                       return 'mdi:trending-up';
-                    } else if (price > 0.13) {
+                    } else if (currentPrice > 0.13) {
                       return 'mdi:trending-neutral';
-                    } else if (price > 0.08) {
+                    } else if (currentPrice > 0.08) {
                       return 'mdi:trending-down';
                     } else {
                       return 'mdi:check-circle';
@@ -1236,21 +1448,133 @@ views:
                     - width: 24px
                     - color: |
                         [[[
-                          var price = parseFloat(states['sensor.current_energy_price_eur'].state);
-                          if (price > 0.40) {
+                          var currentPrice = parseFloat(states['sensor.current_energy_price_eur'].state);
+                          if (currentPrice > 0.40) {
                             return 'var(--red)';
-                          } else if (price > 0.27) {
+                          } else if (currentPrice > 0.27) {
                             return 'var(--red)';
-                          } else if (price > 0.21) {
+                          } else if (currentPrice > 0.21) {
                             return 'var(--orange)';
-                          } else if (price > 0.13) {
+                          } else if (currentPrice > 0.13) {
                             return 'var(--yellow)';
-                          } else if (price > 0.08) {
+                          } else if (currentPrice > 0.08) {
                             return 'var(--blue)';
                           } else {
                             return 'var(--green)';
                           }
                         ]]]
+                  img_cell:
+                    - justify-self: start
+                    - width: 45px
+                    - height: 45px
+                    - background: var(--contrast1)
+                    - border-radius: 50%
+                    - margin-left: 7px
+                  label:
+                    - justify-self: start
+                    - font-size: 18px
+                    - padding-top: 4px
+                    - font-weight: 500
+                    - color: var(--contrast20)
+                  card:
+                    - height: 66px
+                    - border-radius: 24px
+                    - padding: 4px 20px 4px 4px
+                    - background: var(--contrast2)
+                  name:
+                    - justify-self: start
+                    - font-size: 11px
+                    - color: var(--contrast20)
+                    - opacity: 0.7
+                    - padding-bottom: 7px
+                    - overflow: visible
+                    - white-space: normal
+                    - word-wrap: break-word
+              - type: custom:button-card
+                variables:
+                  state: |
+                    [[[
+                      var lowestPrice = parseFloat(states['sensor.nord_pool_ee_lowest_price'].state);
+                      var startTime = states['sensor.nord_pool_ee_lowest_price'].attributes.start;
+                      var endTime = states['sensor.nord_pool_ee_lowest_price'].attributes.end;
+                      if (startTime && endTime) {
+                        var start = new Date(startTime).getHours();
+                        var end = new Date(endTime).getHours();
+                        return `${start}:00-${end}:00 (${lowestPrice.toFixed(2)} €)`;
+                      } else {
+                        return `${lowestPrice.toFixed(2)} €/kWh`;
+                      }
+                    ]]]
+                  secondary: "Best time for high energy consumption"
+                show_label: true
+                show_name: true
+                show_icon: true
+                label: '[[[ return variables.state ]]]'
+                name: '[[[ return variables.secondary ]]]'
+                icon: mdi:arrow-down-circle
+                styles:
+                  grid:
+                    - grid-template-columns: 62px 1fr
+                    - grid-template-areas: '"i l" "i n"'
+                  icon:
+                    - width: 24px
+                    - color: var(--green)
+                  img_cell:
+                    - justify-self: start
+                    - width: 45px
+                    - height: 45px
+                    - background: var(--contrast1)
+                    - border-radius: 50%
+                    - margin-left: 7px
+                  label:
+                    - justify-self: start
+                    - font-size: 18px
+                    - padding-top: 4px
+                    - font-weight: 500
+                    - color: var(--contrast20)
+                  card:
+                    - height: 66px
+                    - border-radius: 24px
+                    - padding: 4px 20px 4px 4px
+                    - background: var(--contrast2)
+                  name:
+                    - justify-self: start
+                    - font-size: 11px
+                    - color: var(--contrast20)
+                    - opacity: 0.7
+                    - padding-bottom: 7px
+                    - overflow: visible
+                    - white-space: normal
+                    - word-wrap: break-word
+              - type: custom:button-card
+                variables:
+                  state: |
+                    [[[
+                      var highestPrice = parseFloat(states['sensor.nord_pool_ee_highest_price'].state);
+                      var startTime = states['sensor.nord_pool_ee_highest_price'].attributes.start;
+                      var endTime = states['sensor.nord_pool_ee_highest_price'].attributes.end;
+                      if (startTime && endTime) {
+                        var start = new Date(startTime).getHours();
+                        var end = new Date(endTime).getHours();
+                        return `${start}:00-${end}:00 (${highestPrice.toFixed(2)} €)`;
+                      } else {
+                        return `${highestPrice.toFixed(2)} €/kWh`;
+                      }
+                    ]]]
+                  secondary: "Avoid high energy consumption at this time"
+                show_label: true
+                show_name: true
+                show_icon: true
+                label: '[[[ return variables.state ]]]'
+                name: '[[[ return variables.secondary ]]]'
+                icon: mdi:arrow-up-circle
+                styles:
+                  grid:
+                    - grid-template-columns: 62px 1fr
+                    - grid-template-areas: '"i l" "i n"'
+                  icon:
+                    - width: 24px
+                    - color: var(--red)
                   img_cell:
                     - justify-self: start
                     - width: 45px

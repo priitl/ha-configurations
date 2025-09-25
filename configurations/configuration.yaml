@@ -42,16 +42,6 @@ template:
         attributes:
           friendly_name: "Mill attic heater total active power"
 
-      - name: current_energy_price_eur_without_fees_and_vat
-        unit_of_measurement: "EUR/kWh"
-        device_class: monetary
-        state_class: measurement
-        state: >
-          {% set energy_price = states('sensor.nordpool_kwh_ee_eur_3_10_0') | float %}
-          {{ energy_price / 100 }}
-        attributes:
-          friendly_name: "Current energy price without fees and VAT EUR/kWh"
-
       - name: current_energy_price_eur
         unit_of_measurement: "EUR/kWh"
         device_class: monetary
@@ -109,7 +99,7 @@ template:
             {% set current_transmission_fee = transmission_fee_day %}
           {% endif %}
 
-          {% set price_without_fees_and_vat = states('sensor.current_energy_price_eur_without_fees_and_vat') | float %}
+          {% set price_without_fees_and_vat = states('sensor.nord_pool_ee_current_price') | float %}
           {% set total_extra_costs = current_transmission_fee + renewable_fee + excise_fee %}
           {% set final_price = (price_without_fees_and_vat + total_extra_costs) * vat_multiplier %}
           {{ final_price | round(5) }}

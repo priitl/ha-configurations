@@ -46,7 +46,7 @@ actions:
                 {% elif not is_cooling_season and outdoor_temp < 5 %}
                   heat
                 {% else %}
-                  auto
+                  heat
                 {% endif %}
             action: climate.set_hvac_mode
           - target:
