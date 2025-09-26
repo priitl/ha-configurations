@@ -6,15 +6,20 @@ triggers:
       - sensor.current_energy_price_eur
       - input_number.min_price
       - input_number.max_price
-      - input_number.living_room_temp
-      - input_number.office_temp
-      - input_number.attic_temp
+      - input_number.living_room_target_temp
+      - input_number.office_target_temp
+      - input_number.attic_target_temp
       - input_boolean.away_mode
     trigger: state
-  # Temperature sensors and climate devices - check every 15 minutes for efficiency
+  # Temperature and humidity sensors and climate devices - check every 15 minutes for efficiency
   - entity_id:
       - weather.ilm_lepiksaare
       - sensor.ag_one_temperature  # Attic temperature sensor
+      - sensor.ag_one_humidity  # Attic humidity sensor
+      - sensor.kontor_esp32_temperature  # Office temperature sensor
+      - sensor.kontor_esp32_humidity  # Office humidity sensor
+      - sensor.suur_tuba_esp32_temperature  # Living room temperature sensor
+      - sensor.suur_tuba_esp32_humidity  # Living room humidity sensor
       - climate.mill_heatergen3panel  # Office radiator state changes
       - climate.mill_heatergen3panel_2  # Attic radiator state changes
       - climate.mitsubishi_pump  # Living room heat pump state changes
@@ -41,12 +46,16 @@ actions:
               device_id: 03d66744855d1695848cff33a60a43d5
             data:
               hvac_mode: |
-                {% if is_cooling_season and outdoor_temp > 32 %}
+                {% if living_room_current_temp < (away_temp - 1.0) %}
+                  heat
+                {% elif living_room_current_humidity > 60 and living_room_current_temp >= away_temp %}
+                  dry
+                {% elif is_cooling_season and outdoor_temp > 32 %}
                   cool
                 {% elif not is_cooling_season and outdoor_temp < 5 %}
                   heat
                 {% else %}
-                  heat
+                  fan_only
                 {% endif %}
             action: climate.set_hvac_mode
           - target:
@@ -95,13 +104,17 @@ actions:
                   - target:
                       device_id: 03d66744855d1695848cff33a60a43d5
                     data:
-                      temperature: "{{ living_room_temp }}"
+                      temperature: "{{ living_room_target_temp }}"
                     action: climate.set_temperature
                   - target:
                       device_id: 03d66744855d1695848cff33a60a43d5
                     data:
                       hvac_mode: |
-                        {% if is_cooling_season %}
+                        {% if living_room_current_temp < (living_room_target_temp - 1.0) %}
+                          heat
+                        {% elif living_room_current_humidity > 55 and living_room_current_temp >= living_room_target_temp %}
+                          dry
+                        {% elif is_cooling_season %}
                           {% if outdoor_temp > 25 %}
                             cool
                           {% else %}
@@ -139,13 +152,13 @@ actions:
                   - target:
                       device_id: 29113dc51f50d91328a55261fd8de2a2
                     data:
-                      temperature: "{{ office_temp }}"
+                      temperature: "{{ office_target_temp }}"
                     action: climate.set_temperature
                   - target:
                       device_id: 29113dc51f50d91328a55261fd8de2a2
                     data:
                       hvac_mode: |
-                        {% if office_current_temp is defined and office_current_temp|float >= (office_temp|float + 0.5) %}
+                        {% if office_current_temp is defined and office_current_temp|float >= (office_target_temp|float + 0.5) %}
                           off
                         {% else %}
                           heat
@@ -155,13 +168,13 @@ actions:
                   - target:
                       device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
                     data:
-                      temperature: "{{ attic_temp }}"
+                      temperature: "{{ attic_target_temp }}"
                     action: climate.set_temperature
                   - target:
                       device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
                     data:
                       hvac_mode: |
-                        {% if attic_current_temp >= (attic_temp|float + 0.5) %}
+                        {% if attic_current_temp >= (attic_target_temp|float + 0.5) %}
                           off
                         {% else %}
                           heat
@@ -180,23 +193,27 @@ actions:
                       temperature: |
                         {% if is_cooling_season %}
                           {% if outdoor_temp > 30 %}
-                            {{ living_room_temp }}
+                            {{ living_room_target_temp }}
                           {% elif outdoor_temp > 27 and current_price < max_price %}
-                            {{ living_room_temp + 1 }}
+                            {{ living_room_target_temp + 1 }}
                           {% else %}
                             {{ 28 }}
                           {% endif %}
                         {% else %}
-                          {{ living_room_temp - (temp_reduction * price_ratio) }}
+                          {{ [16, living_room_target_temp - (temp_reduction * price_ratio)] | max | round(1) }}
                         {% endif %}
                     action: climate.set_temperature
                   - target:
                       device_id: 03d66744855d1695848cff33a60a43d5
                     data:
                       hvac_mode: |
-                        {% if current_price > max_price and not is_cooling_season %}
-                          {% if living_room_current_temp is defined and living_room_current_temp|float >= (living_room_temp|float - 1.0) %}
-                            off
+                        {% if living_room_current_temp < (living_room_target_temp - 1.0) %}
+                          heat
+                        {% elif living_room_current_humidity > 55 and living_room_current_temp >= living_room_target_temp %}
+                          dry
+                        {% elif current_price > max_price and not is_cooling_season %}
+                          {% if living_room_current_temp is defined and living_room_current_temp|float >= (living_room_target_temp|float - 1.0) %}
+                            fan_only
                           {% else %}
                             heat
                           {% endif %}
@@ -234,13 +251,13 @@ actions:
                   - target:
                       device_id: 29113dc51f50d91328a55261fd8de2a2
                     data:
-                      temperature: "{{ office_temp - (temp_reduction * price_ratio) }}"
+                      temperature: "{{ office_target_temp - (temp_reduction * price_ratio) }}"
                     action: climate.set_temperature
                   - target:
                       device_id: 29113dc51f50d91328a55261fd8de2a2
                     data:
                       hvac_mode: |
-                        {% set target_temp = office_temp - (temp_reduction * price_ratio) %}
+                        {% set target_temp = office_target_temp - (temp_reduction * price_ratio) %}
                         {% if current_price > max_price %}
                           {% if office_current_temp is defined and office_current_temp|float >= target_temp|float %}
                             off
@@ -256,13 +273,13 @@ actions:
                   - target:
                       device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
                     data:
-                      temperature: "{{ attic_temp - (temp_reduction * price_ratio) }}"
+                      temperature: "{{ attic_target_temp - (temp_reduction * price_ratio) }}"
                     action: climate.set_temperature
                   - target:
                       device_id: 15cbc96ee1ff142c5b0274eaf7f12c4e
                     data:
                       hvac_mode: |
-                        {% set target_temp = attic_temp - (temp_reduction * price_ratio) %}
+                        {% set target_temp = attic_target_temp - (temp_reduction * price_ratio) %}
                         {% if current_price > max_price %}
                           {% if attic_current_temp >= target_temp|float %}
                             off
@@ -293,14 +310,17 @@ variables:
   is_cooling_season: "{{ month in [6, 7, 8, 9] and outdoor_temp > 22 }}"
 
   # Room target temperatures
-  living_room_temp: "{{ states('input_number.living_room_temp')|float }}"
-  office_temp: "{{ states('input_number.office_temp')|float }}"
-  attic_temp: "{{ states('input_number.attic_temp')|float }}"
+  living_room_target_temp: "{{ states('input_number.living_room_target_temp')|float }}"
+  office_target_temp: "{{ states('input_number.office_target_temp')|float }}"
+  attic_target_temp: "{{ states('input_number.attic_target_temp')|float }}"
 
-  # Current room temperatures (for efficient cycling)
-  living_room_current_temp: "{{ state_attr('climate.mitsubishi_pump', 'current_temperature')|float(0) }}"
-  office_current_temp: "{{ state_attr('climate.mill_heatergen3panel', 'current_temperature')|float(0) }}"
+  # Current room temperatures and humidity (from separate sensors)
+  living_room_current_temp: "{{ states('sensor.suur_tuba_esp32_temperature')|float(0) }}"
+  living_room_current_humidity: "{{ states('sensor.suur_tuba_esp32_humidity')|float(0) }}"
+  office_current_temp: "{{ states('sensor.kontor_esp32_temperature')|float(0) }}"
+  office_current_humidity: "{{ states('sensor.kontor_esp32_humidity')|float(0) }}"
   attic_current_temp: "{{ states('sensor.ag_one_temperature')|float(0) }}"
+  attic_current_humidity: "{{ states('sensor.ag_one_humidity')|float(0) }}"
 
   # Away mode temperature
   away_temp: 17

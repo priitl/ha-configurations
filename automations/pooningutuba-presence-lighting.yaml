@@ -1,0 +1,48 @@
+alias: Pööningutuba Presence Lighting
+description: Turn lights on/off based on presence detection in attic room
+triggers:
+  # Trigger when presence is detected
+  - entity_id: binary_sensor.pooningutuba_presence_sensor_occupancy
+    to: "on"
+    trigger: state
+  # Trigger when presence is cleared
+  - entity_id: binary_sensor.pooningutuba_presence_sensor_occupancy
+    to: "off"
+    trigger: state
+  # Periodic check for illuminance changes
+  - trigger: time_pattern
+    minutes: "/30"  # Check every 30 minutes for efficiency
+conditions:
+  - condition: state
+    entity_id: input_boolean.away_mode
+    state: "off"
+actions:
+  - choose:
+      # When presence is detected and it's dark enough - turn on ledid and kapiled
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.pooningutuba_presence_sensor_occupancy
+            state: "on"
+          - condition: numeric_state
+            entity_id: sensor.pooningutuba_presence_sensor_illuminance
+            below: 50  # lux threshold - adjust as needed
+        sequence:
+          - action: light.turn_on
+            target:
+              entity_id:
+                - light.shellydimmer2_ec64c9c4d1f4  # ledid
+                - light.h619a  # kapiled
+      # When presence is cleared - turn off all lights
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.pooningutuba_presence_sensor_occupancy
+            state: "off"
+        sequence:
+          - action: light.turn_off
+            target:
+              entity_id:
+                - light.shellydimmer2_ec64c9c4d1f4  # ledid
+                - light.shellydimmer2_ec64c9c66cdd  # spotid
+                - light.shellydimmer2_ec64c9c66f3d  # ripplambid
+                - light.h619a  # kapiled
+mode: restart

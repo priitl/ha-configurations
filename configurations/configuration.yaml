@@ -377,24 +377,24 @@ input_number:
     unit_of_measurement: "senti/kWh"
 
   # Room target temperatures
-  living_room_temp:
-    name: Elutoa temperatuur
+  living_room_target_temp:
+    name: Suur tuba target temperature
     min: 16
     max: 26
     step: 0.5
     unit_of_measurement: "°C"
     initial: 21
 
-  office_temp:
-    name: Kontorin temperatuur
+  office_target_temp:
+    name: Kontor target temperature
     min: 16
     max: 26
     step: 0.5
     unit_of_measurement: "°C"
     initial: 20
 
-  attic_temp:
-    name: Pööningu temperatuur
+  attic_target_temp:
+    name: Pööningutuba target temperature
     min: 16
     max: 26
     step: 0.5
