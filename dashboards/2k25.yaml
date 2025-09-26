@@ -142,7 +142,7 @@ button_card_templates:
             - value: "on"
               styles:
                 icon:
-                  - color: "#FFDA78"
+                  - color: var(--orange)
           styles:
             card:
               - display: >-
@@ -177,7 +177,7 @@ button_card_templates:
             - value: "on"
               styles:
                 icon:
-                  - color: "#FFDA78"
+                  - color: var(--orange)
           styles:
             card:
               - display: >-
@@ -212,7 +212,7 @@ button_card_templates:
             - value: "on"
               styles:
                 icon:
-                  - color: "#FFDA78"
+                  - color: var(--orange)
           styles:
             card:
               - display: >-
@@ -809,7 +809,7 @@ views:
                 - word-wrap: break-word
                 - text-align: left
               card:
-                - height: 100px
+                - height: 110px
                 - border-radius: 24px
                 - padding: 4px 20px 4px 4px
                 - background: var(--contrast2)
@@ -837,7 +837,7 @@ views:
                     - entity: light.suure_toa_soogilaua_tuled
                       name: Söögilaua tuled
                       icon: mdi:lightbulb-group
-                  target_temp_entity: input_number.living_room_temp
+                  target_temp_entity: input_number.living_room_target_temp
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -877,7 +877,7 @@ views:
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
-                  room_name: Mari Tuba
+                  room_name: Mari tuba
                   temp_entity: sensor.mari_tuba_xiaomi_temp_humidity_temperature
                   humidity_entity: sensor.mari_tuba_xiaomi_temp_humidity_humidity
                   co2_entity: ''
@@ -895,10 +895,10 @@ views:
                 variables:
                   room_name: Pööningutuba
                   temp_entity: sensor.ag_one_temperature
-                  humidity_entity: sensors.ag_one_humidity
+                  humidity_entity: sensor.ag_one_humidity
                   co2_entity: sensor.ag_one_carbon_dioxide
                   icon: mdi:home-roof
-                  target_temp_entity: input_number.attic_temp
+                  target_temp_entity: input_number.attic_target_temp
                   light_entities:
                     - entity: light.shellydimmer2_ec64c9c66cdd
                       name: Pööningutoa ripplambid
@@ -924,7 +924,7 @@ views:
                   humidity_entity: sensor.kontor_esp32_humidity
                   co2_entity: sensor.kontor_esp32_co2
                   icon: mdi:chair-rolling
-                  target_temp_entity: input_number.office_temp
+                  target_temp_entity: input_number.office_target_temp
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -1426,11 +1426,11 @@ views:
                         [[[
                           var power = parseFloat(states['sensor.shellypro3em_2cbcbba6f604_total_active_power'].state);
                           if (power > 5) {
-                            return 'red';
+                            return 'var(--red)';
                           } else if (power > 2) {
-                            return 'orange';
+                            return 'var(--orange)';
                           } else {
-                            return 'green';
+                            return 'var(--green)';
                           }
                         ]]]
                   img_cell:
@@ -1532,9 +1532,9 @@ views:
                           } else if (currentPrice > 0.21) {
                             return 'var(--orange)';
                           } else if (currentPrice > 0.13) {
-                            return 'var(--yellow)';
+                            return 'var(--orange)';
                           } else if (currentPrice > 0.08) {
-                            return 'var(--blue)';
+                            return 'var(--green)';
                           } else {
                             return 'var(--green)';
                           }
