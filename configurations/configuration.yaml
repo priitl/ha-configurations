@@ -153,15 +153,13 @@ template:
             (m == pentecost_date.month and d == pentecost_date.day)
           ) %}
 
-          {# Final check for Night Rate Applicability #}
           {% set is_holiday = is_fixed_holiday or is_moving_holiday %}
           {% set is_weekend = now_obj.weekday() >= 5 %} {# 5=Saturday, 6=Sunday #}
-          {% set is_night_hours = now_obj.hour < 7 or now_obj.hour >= 22 %}
 
-          {% if is_holiday or is_weekend or is_night_hours %}
+          {% if is_holiday or is_weekend %}
             {% set current_transmission_fee = transmission_fee_night %}
           {% else %}
-            {% set current_transmission_fee = transmission_fee_day %}
+            {% set current_transmission_fee = (transmission_fee_day + transmission_fee_night) / 2 %}
           {% endif %}
 
           {% set price_without_fees_and_vat = states('sensor.nord_pool_ee_daily_average') | float %}
@@ -181,7 +179,8 @@ template:
           {% set renewable_fee = 0.0084 %}
           {% set excise_fee = 0.0021 %}
           {% set vat_multiplier = 1.24 %}
-          {% set now_obj = now() %}
+          {% set start_time = states.sensor.nord_pool_ee_lowest_price.attributes.start %}
+          {% set now_obj = start_time | as_datetime | as_local %}
 
           {% set m = now_obj.month %}
           {% set d = now_obj.day %}
@@ -245,7 +244,8 @@ template:
           {% set renewable_fee = 0.0084 %}
           {% set excise_fee = 0.0021 %}
           {% set vat_multiplier = 1.24 %}
-          {% set now_obj = now() %}
+          {% set start_time = states.sensor.nord_pool_ee_highest_price.attributes.start %}
+          {% set now_obj = start_time | as_datetime | as_local %}
 
           {% set m = now_obj.month %}
           {% set d = now_obj.day %}
@@ -348,29 +348,15 @@ http:
     - 192.168.60.64
 
 input_number:
-  min_temp:
-    name: Temperatuur min
-    min: 10
-    max: 14.5
-    step: 0.5
-    unit_of_measurement: "°C"
-
-  max_temp:
-    name: Temperatuur max
-    min: 15
-    max: 26
-    step: 0.5
-    unit_of_measurement: "°C"
-
-  min_price:
-    name: Elektrihind min
+  cheap_price_threshold:
+    name: Climate Control Cheap Price Threshold
     min: 6
     max: 19.5
     step: 0.5
     unit_of_measurement: "senti/kWh"
 
-  max_price:
-    name: Elektrihind max
+  expensive_price_threshold:
+    name: Climate Control Expensive Price Threshold
     min: 20
     max: 50
     step: 0.5

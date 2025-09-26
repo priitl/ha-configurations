@@ -4,8 +4,8 @@ triggers:
   # Immediate triggers for price changes and user input changes
   - entity_id:
       - sensor.current_energy_price_eur
-      - input_number.min_price
-      - input_number.max_price
+      - input_number.cheap_price_threshold
+      - input_number.expensive_price_threshold
       - input_number.living_room_target_temp
       - input_number.office_target_temp
       - input_number.attic_target_temp
@@ -98,7 +98,7 @@ actions:
               # Cheap electricity - optimal comfort mode
               - conditions:
                   - condition: template
-                    value_template: "{{ current_price < min_price }}"
+                    value_template: "{{ current_price < cheap_price_threshold }}"
                 sequence:
                   # Mitsubishi heat pump (living room) - full featured control
                   - target:
@@ -132,7 +132,7 @@ actions:
                       fan_mode: |
                         {% if is_cooling_season and outdoor_temp > 28 %}
                           3 High
-                        {% elif current_price < (min_price * 0.8) %}
+                        {% elif current_price < (cheap_price_threshold * 0.8) %}
                           2 Low
                         {% else %}
                           1 Lowest
@@ -184,7 +184,7 @@ actions:
               # Medium/Expensive electricity - efficient energy-saving mode
               - conditions:
                   - condition: template
-                    value_template: "{{ current_price >= min_price }}"
+                    value_template: "{{ current_price >= cheap_price_threshold }}"
                 sequence:
                   # Mitsubishi with intelligent seasonal and price logic
                   - target:
@@ -194,7 +194,7 @@ actions:
                         {% if is_cooling_season %}
                           {% if outdoor_temp > 30 %}
                             {{ living_room_target_temp }}
-                          {% elif outdoor_temp > 27 and current_price < max_price %}
+                          {% elif outdoor_temp > 27 and current_price < expensive_price_threshold %}
                             {{ living_room_target_temp + 1 }}
                           {% else %}
                             {{ 28 }}
@@ -211,7 +211,7 @@ actions:
                           heat
                         {% elif living_room_current_humidity > 55 and living_room_current_temp >= living_room_target_temp %}
                           dry
-                        {% elif current_price > max_price and not is_cooling_season %}
+                        {% elif current_price > expensive_price_threshold and not is_cooling_season %}
                           {% if living_room_current_temp is defined and living_room_current_temp|float >= (living_room_target_temp|float - 1.0) %}
                             fan_only
                           {% else %}
@@ -229,7 +229,7 @@ actions:
                       device_id: 03d66744855d1695848cff33a60a43d5
                     data:
                       fan_mode: |
-                        {% if current_price > max_price %}
+                        {% if current_price > expensive_price_threshold %}
                           1 Lowest
                         {% elif is_cooling_season and outdoor_temp > 30 %}
                           2 Low
@@ -258,7 +258,7 @@ actions:
                     data:
                       hvac_mode: |
                         {% set target_temp = office_target_temp - (temp_reduction * price_ratio) %}
-                        {% if current_price > max_price %}
+                        {% if current_price > expensive_price_threshold %}
                           {% if office_current_temp is defined and office_current_temp|float >= target_temp|float %}
                             off
                           {% else %}
@@ -280,7 +280,7 @@ actions:
                     data:
                       hvac_mode: |
                         {% set target_temp = attic_target_temp - (temp_reduction * price_ratio) %}
-                        {% if current_price > max_price %}
+                        {% if current_price > expensive_price_threshold %}
                           {% if attic_current_temp >= target_temp|float %}
                             off
                           {% else %}
@@ -297,9 +297,9 @@ mode: queued
 variables:
   # Price variables
   current_price: "{{ states('sensor.current_energy_price_eur')|float }}"
-  min_price: "{{ states('input_number.min_price')|float / 100 }}"
-  max_price: "{{ states('input_number.max_price')|float / 100 }}"
-  price_ratio: "{{ ((current_price - min_price) / (max_price - min_price)) | float }}"
+  cheap_price_threshold: "{{ states('input_number.cheap_price_threshold')|float / 100 }}"
+  expensive_price_threshold: "{{ states('input_number.expensive_price_threshold')|float / 100 }}"
+  price_ratio: "{{ ((current_price - cheap_price_threshold) / (expensive_price_threshold - cheap_price_threshold)) | float }}"
 
   # Mode variables
   away_mode: "{{ is_state('input_boolean.away_mode', 'on') }}"

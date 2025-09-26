@@ -1575,9 +1575,9 @@ views:
                       if (startTime && endTime) {
                         var start = new Date(startTime).getHours();
                         var end = new Date(endTime).getHours();
-                        return `Best time ${start}:00 - ${end}:00`;
+                        return `Best Time ${start}:00 - ${end}:00`;
                       } else {
-                        return 'Best time for consumption';
+                        return 'Best Time for consumption';
                       }
                     ]]]
                   secondary: |
@@ -1634,9 +1634,9 @@ views:
                       if (startTime && endTime) {
                         var start = new Date(startTime).getHours();
                         var end = new Date(endTime).getHours();
-                        return `Worst time ${start}:00 - ${end}:00`;
+                        return `Worst Time ${start}:00 - ${end}:00`;
                       } else {
-                        return 'Worst time for consumption';
+                        return 'Worst Time for consumption';
                       }
                     ]]]
                   secondary: |
@@ -1696,14 +1696,14 @@ views:
             cards:
               - type: custom:button-card
                 template: custom_card_room_sensor
-                entity: input_number.min_price
-                name: Min Price
+                entity: input_number.cheap_price_threshold
+                name: Cheap Price Threshold
                 icon: mdi:arrow-down-circle
                 variables:
-                  target_temp_entity: input_number.min_price
+                  target_temp_entity: input_number.cheap_price_threshold
                 label: |
                   [[[
-                    var state = states['input_number.min_price'];
+                    var state = states['input_number.cheap_price_threshold'];
                     if (state && state.state) {
                       return `${parseFloat(state.state).toFixed(1)} ct/kWh`;
                     }
@@ -1711,14 +1711,14 @@ views:
                   ]]]
               - type: custom:button-card
                 template: custom_card_room_sensor
-                entity: input_number.max_price
-                name: Max Price
+                entity: input_number.expensive_price_threshold
+                name: Expensive Price Threshold
                 icon: mdi:arrow-up-circle
                 variables:
-                  target_temp_entity: input_number.max_price
+                  target_temp_entity: input_number.expensive_price_threshold
                 label: |
                   [[[
-                    var state = states['input_number.max_price'];
+                    var state = states['input_number.expensive_price_threshold'];
                     if (state && state.state) {
                       return `${parseFloat(state.state).toFixed(1)} ct/kWh`;
                     }
