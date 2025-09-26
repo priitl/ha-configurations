@@ -1,27 +1,25 @@
 alias: Generate AI Weather Report
 sequence:
-  - service: weather.get_forecasts
-    data:
+  - data:
       type: hourly
     target:
       entity_id: weather.ilm_lepiksaare
     response_variable: hourly_forecast
-  - service: conversation.process
-    data:
+    action: weather.get_forecasts
+  - data:
       agent_id: conversation.openai_conversation
       text: >-
-        You are a witty, slightly sarcastic weather forecaster for a smart home dashboard.
-        Your task is to provide a brief, multi-sentence forecast for the day in English.
-        First, describe the outlook for the day (mentioning the temperature range). Then, follow it up with a funny or sarcastic piece of advice.
-        Keep it concise and under 255 characters total. No hashtags.
+        You are a witty, sarcastic forecaster. Describe the character of today's
+        clouds and wind and mention the temp range. Follow up with a piece of
+        sarcastic advice. Keep it concise and under 255 characters. No hashtags.
 
-        Today's Forecast Data:
-        - {{ hourly_forecast['weather.ilm_lepiksaare'] }}
+        Today's Forecast Data: - {{ hourly_forecast['weather.ilm_lepiksaare'] }}
     response_variable: ai_weather_report
-  - service: input_text.set_value
-    target:
+    action: conversation.process
+  - target:
       entity_id: input_text.ai_weather_report
     data:
       value: "{{ ai_weather_report.response.speech.plain.speech }}"
+    action: input_text.set_value
 mode: single
 icon: mdi:weather-sunny-alert
