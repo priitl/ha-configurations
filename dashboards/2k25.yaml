@@ -99,7 +99,16 @@ button_card_templates:
           temp = null;
         }
         if (temp !== null) {
-          parts.push(`${parseFloat(temp).toFixed(1).replace(".", ",")} °C`);
+          var tempValue = parseFloat(temp);
+          var tempColor = 'var(--primary-text-color)'; // default color
+          if (tempValue < 18) {
+            tempColor = 'var(--teal)';
+          } else if (tempValue > 25) {
+            tempColor = 'var(--orange)';
+          } else if (tempValue > 28) {
+            tempColor = 'var(--red)';
+          }
+          parts.push(`<span style="color: ${tempColor}">${tempValue.toFixed(1).replace(".", ",")} °C</span>`);
         }
 
         // Humidity
@@ -108,7 +117,15 @@ button_card_templates:
           var humValue;
           if (humState && humState.state !== 'unavailable' && humState.state !== 'unknown') {
             humValue = parseFloat(humState.state);
-            parts.push(`${humValue.toFixed(0)}%`);
+            var humColor = 'var(--primary-text-color)'; // default color
+            if (humValue < 30) {
+              humColor = 'var(--teal)';
+            } else if (humValue > 60) {
+              humColor = 'var(--orange)';
+            } else if (humValue > 70) {
+              humColor = 'var(--red)';
+            }
+            parts.push(`<span style="color: ${humColor}">${humValue.toFixed(0)}%</span>`);
           }
         }
 
@@ -118,7 +135,13 @@ button_card_templates:
           var co2Value;
           if (co2State && co2State.state !== 'unavailable' && co2State.state !== 'unknown') {
             co2Value = parseFloat(co2State.state);
-            parts.push(`${co2Value} ppm`);
+            var co2Color = 'var(--primary-text-color)'; // default color
+            if (co2Value > 800) {
+              co2Color = 'var(--orange)';
+            } else if (co2Value > 1200) {
+              co2Color = 'var(--red)';
+            }
+            parts.push(`<span style="color: ${co2Color}">${co2Value} ppm</span>`);
           }
         }
 
