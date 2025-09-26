@@ -47,7 +47,7 @@ button_card_templates:
       card:
         - height: 66px
         - border-radius: 24px
-        - padding: 4px 20px 4px 4px
+        - padding: 4px
         - background: var(--contrast2)
       name:
         - justify-self: start
@@ -96,9 +96,11 @@ button_card_templates:
           }
         }
         if (!tempEntity || temp === undefined || temp === null || temp === 'unavailable' || temp === 'unknown') {
-          temp = (Math.random() * 6 + 18).toFixed(1);
+          temp = null;
         }
-        parts.push(`${parseFloat(temp).toFixed(1).replace(".", ",")} °C`);
+        if (temp !== null) {
+          parts.push(`${parseFloat(temp).toFixed(1).replace(".", ",")} °C`);
+        }
 
         // Humidity
         if (variables.humidity_entity) {
@@ -106,10 +108,8 @@ button_card_templates:
           var humValue;
           if (humState && humState.state !== 'unavailable' && humState.state !== 'unknown') {
             humValue = parseFloat(humState.state);
-          } else {
-            humValue = Math.floor(Math.random() * 40) + 30;
+            parts.push(`${humValue.toFixed(0)}%`);
           }
-          parts.push(`${humValue.toFixed(0)}%`);
         }
 
         // CO2
@@ -118,10 +118,8 @@ button_card_templates:
           var co2Value;
           if (co2State && co2State.state !== 'unavailable' && co2State.state !== 'unknown') {
             co2Value = parseFloat(co2State.state);
-          } else {
-            co2Value = Math.floor(Math.random() * 800) + 400;
+            parts.push(`${co2Value} ppm`);
           }
-          parts.push(`${co2Value} ppm`);
         }
 
         return parts.join(' • ');
@@ -309,14 +307,15 @@ button_card_templates:
               entity_id: '[[[ return variables.target_temp_entity ]]]'
     styles:
       grid:
-        - grid-template-columns: 50px 1fr repeat(6, 32px)
+        - grid-template-columns: 50px 1fr auto auto auto auto auto auto
         - grid-template-areas: >-
-            "i n light3 light2 light1 temp_minus temp_display temp_plus" "i l
-            light3 light2 light1 temp_minus temp_display temp_plus"
+            "i n . light3 light2 light1 temp_minus temp_display temp_plus" "i l
+            . light3 light2 light1 temp_minus temp_display temp_plus"
         - grid-template-rows: auto auto
         - align-content: center
         - gap: 2px
         - column-gap: 1px
+        - justify-content: start
       icon:
         - width: 24px
         - color: '#6f6f6f'
@@ -350,7 +349,7 @@ button_card_templates:
       card:
         - height: 66px
         - border-radius: 24px
-        - padding: 4px 20px 4px 4px
+        - padding: 4px 14px 4px 4px
         - background: var(--contrast2)
       custom_fields:
         controls:
@@ -818,6 +817,10 @@ views:
             heading: Rooms
             heading_style: title
             icon: mdi:google-classroom
+          - type: heading
+            heading: First Floor
+            heading_style: subtitle
+            icon: mdi:home-floor-1
           - square: false
             columns: 1
             type: grid
@@ -825,16 +828,68 @@ views:
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
-                  room_name: Suur Tuba
-                  temp_entity: sensor.mitsubishi_pump_indoor
-                  humidity_entity: ''
-                  co2_entity: sensor.living_room_co2
+                  room_name: Suur tuba
+                  temp_entity: sensor.suur_tuba_esp32_temperature
+                  humidity_entity: sensor.suur_tuba_esp32_humidity
+                  co2_entity: sensor.suur_tuba_esp32_co2
                   icon: mdi:sofa
                   light_entities:
                     - entity: light.suure_toa_soogilaua_tuled
                       name: Söögilaua tuled
                       icon: mdi:lightbulb-group
                   target_temp_entity: input_number.living_room_temp
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Köök
+                  temp_entity: sensor.kook_esp32_temperature
+                  humidity_entity: sensor.kook_esp32_humidity
+                  co2_entity: sensor.kook_esp32_co2
+                  icon: mdi:chef-hat
+                  light_entities:
+                    - entity: switch.nutipistik_1
+                      name: Köögi LED
+                      icon: mdi:led-strip-variant
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Koridor
+                  temp_entity: sensor.koridor_esp32_temperature
+                  humidity_entity: sensor.koridor_esp32_humidity
+                  co2_entity: ''
+                  icon: mdi:stairs
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Vasja köök
+                  temp_entity: sensor.vasja_kook_esp32_temperature
+                  humidity_entity: sensor.vasja_kook_esp32_humidity
+                  co2_entity: sensor.vasja_kook_esp32_co2
+                  icon: mdi:table-chair
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Vasja magamistuba
+                  temp_entity: sensor.vasja_magamistuba_temp_humidity_temperature
+                  humidity_entity: sensor.vasja_magamistuba_temp_humidity_humidity
+                  co2_entity: ''
+                  icon: mdi:human-cane
+              - type: custom:button-card
+                template: custom_card_room_sensor
+                variables:
+                  room_name: Mari Tuba
+                  temp_entity: sensor.mari_tuba_xiaomi_temp_humidity_temperature
+                  humidity_entity: sensor.mari_tuba_xiaomi_temp_humidity_humidity
+                  co2_entity: ''
+                  icon: mdi:cat
+          - type: heading
+            heading: Second Floor
+            heading_style: subtitle
+            icon: mdi:home-floor-2
+          - square: false
+            columns: 1
+            type: grid
+            cards:
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
@@ -865,39 +920,19 @@ views:
                 template: custom_card_room_sensor
                 variables:
                   room_name: Kontor
-                  temp_entity: climate.mill_heatergen3panel
-                  humidity_entity: ''
-                  co2_entity: sensor.upper_room_co2
+                  temp_entity: sensor.kontor_esp32_temperature
+                  humidity_entity: sensor.kontor_esp32_humidity
+                  co2_entity: sensor.kontor_esp32_co2
                   icon: mdi:chair-rolling
                   target_temp_entity: input_number.office_temp
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
-                  room_name: Köök
-                  temp_entity: sensor.kitchen_temperature
-                  humidity_entity: sensor.kitchen_humidity
-                  co2_entity: sensor.kitchen_co2
-                  icon: mdi:chef-hat
-                  light_entities:
-                    - entity: switch.nutipistik_1
-                      name: Köögi LED
-                      icon: mdi:led-strip-variant
-              - type: custom:button-card
-                template: custom_card_room_sensor
-                variables:
-                  room_name: Koridor
-                  temp_entity: sensor.hallway_temperature
-                  humidity_entity: sensor.hallway_humidity
+                  room_name: Papsi tuba
+                  temp_entity: sensor.papsi_tuba_temp_humidity_temperature
+                  humidity_entity: sensor.papsi_tuba_temp_humidity_humidity
                   co2_entity: ''
-                  icon: mdi:stairs
-              - type: custom:button-card
-                template: custom_card_room_sensor
-                variables:
-                  room_name: Vasja Köök
-                  temp_entity: sensor.esp32_vasja_tuba_sht41_temperature
-                  humidity_entity: sensor.esp32_vasja_tuba_sht41_humidity
-                  co2_entity: sensor.esp32_vasja_tuba_co2
-                  icon: mdi:human-cane
+                  icon: mdi:glass-mug-variant
       - type: grid
         cards:
           - type: heading
@@ -924,7 +959,7 @@ views:
                     ha-card {
                       height: 66px;
                       border-radius: 24px;
-                      padding: 4px 20px 4px 4px;
+                      padding: 4px 0px 4px 4px;
                       background: var(--contrast2);
                     }
               - type: custom:mushroom-climate-card
@@ -943,8 +978,11 @@ views:
                     ha-card {
                       height: 66px;
                       border-radius: 24px;
-                      padding: 4px 20px 4px 4px;
+                      padding: 4px 0px 4px 4px;
                       background: var(--contrast2);
+                    }
+                    .container {
+                      justify-content: space-between !important;
                     }
               - type: custom:mushroom-climate-card
                 entity: climate.mitsubishi_pump
@@ -957,8 +995,11 @@ views:
                     ha-card {
                       height: 66px;
                       border-radius: 24px;
-                      padding: 4px 20px 4px 4px;
+                      padding: 4px 0px 4px 4px;
                       background: var(--contrast2);
+                    }
+                    .container {
+                      justify-content: space-between !important;
                     }
         column_span: 4
       - type: grid
@@ -1408,7 +1449,7 @@ views:
                   card:
                     - height: 66px
                     - border-radius: 24px
-                    - padding: 4px 20px 4px 4px
+                    - padding: 4px
                     - background: var(--contrast2)
                   name:
                     - justify-self: start
@@ -1514,7 +1555,7 @@ views:
                   card:
                     - height: 66px
                     - border-radius: 24px
-                    - padding: 4px 20px 4px 4px
+                    - padding: 4px
                     - background: var(--contrast2)
                   name:
                     - justify-self: start
@@ -1573,7 +1614,7 @@ views:
                   card:
                     - height: 66px
                     - border-radius: 24px
-                    - padding: 4px 20px 4px 4px
+                    - padding: 4px
                     - background: var(--contrast2)
                   name:
                     - justify-self: start
@@ -1632,7 +1673,7 @@ views:
                   card:
                     - height: 66px
                     - border-radius: 24px
-                    - padding: 4px 20px 4px 4px
+                    - padding: 4px
                     - background: var(--contrast2)
                   name:
                     - justify-self: start
