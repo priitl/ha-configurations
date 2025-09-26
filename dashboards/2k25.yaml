@@ -310,7 +310,7 @@ button_card_templates:
         - grid-template-columns: 50px 1fr auto auto auto auto auto auto
         - grid-template-areas: >-
             "i n . light3 light2 light1 temp_minus temp_display temp_plus" "i l
-            . light3 light2 light1 temp_minus temp_display temp_plus"
+            l light3 light2 light1 temp_minus temp_display temp_plus"
         - grid-template-rows: auto auto
         - align-content: center
         - gap: 2px
@@ -900,11 +900,6 @@ views:
                   icon: mdi:home-roof
                   target_temp_entity: input_number.attic_target_temp
                   light_entities:
-                    - entity: light.shellydimmer2_ec64c9c66cdd
-                      name: Pööningutoa ripplambid
-                      icon: mdi:ceiling-light
-                      brightness: false
-                      collapsible: true
                     - entity: light.shellydimmer2_ec64c9c4d1f4
                       name: Pööningutoa LED
                       icon: mdi:light-flood-up
@@ -916,6 +911,11 @@ views:
                       color: true
                       collapsible: true
                       use_color: true
+                    - entity: light.shellydimmer2_ec64c9c66cdd
+                      name: Pööningutoa ripplambid
+                      icon: mdi:ceiling-light
+                      brightness: false
+                      collapsible: true
               - type: custom:button-card
                 template: custom_card_room_sensor
                 variables:
