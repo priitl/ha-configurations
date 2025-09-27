@@ -66,6 +66,7 @@ button_card_templates:
       - '[[[ return variables.temp_entity ]]]'
       - '[[[ return variables.humidity_entity ]]]'
       - '[[[ return variables.co2_entity ]]]'
+      - '[[[ return variables.presence_entity ]]]'
     show_icon: true
     show_name: true
     show_state: false
@@ -74,6 +75,7 @@ button_card_templates:
       temp_entity: ''
       humidity_entity: ''
       co2_entity: ''
+      presence_entity: ''
       radius: 24px
       icon: mdi:thermometer
       light_entities: []
@@ -328,6 +330,40 @@ button_card_templates:
             perform_action: input_number.increment
             target:
               entity_id: '[[[ return variables.target_temp_entity ]]]'
+      presence_badge:
+        card:
+          type: custom:button-card
+          entity: '[[[ return variables.presence_entity || "" ]]]'
+          show_icon: true
+          show_name: false
+          icon: mdi:account-tie-voice
+          state:
+            - value: "off"
+              styles:
+                card:
+                  - display: none
+            - value: "unavailable"
+              styles:
+                card:
+                  - display: none
+            - value: "unknown"
+              styles:
+                card:
+                  - display: none
+          styles:
+            card:
+              - display: '[[[ return variables.presence_entity && states[variables.presence_entity] && states[variables.presence_entity].state === "on" ? "block" : "none" ]]]'
+              - border-radius: 50%
+              - width: 16px
+              - height: 16px
+              - background: var(--green)
+              - z-index: 999
+              - position: absolute
+              - top: 4px
+              - left: -6px
+            icon:
+              - color: var(--black)
+              - width: 10px
     styles:
       grid:
         - grid-template-columns: 50px 1fr auto auto auto auto auto auto
@@ -378,6 +414,11 @@ button_card_templates:
         controls:
           - justify-self: end
           - align-self: center
+        presence_badge:
+          - position: absolute
+          - top: 9px
+          - left: 43px
+          - z-index: 999
   custom_card_sensor_small:
     template: setup
     variables:
@@ -855,6 +896,7 @@ views:
                   temp_entity: sensor.suur_tuba_esp32_temperature
                   humidity_entity: sensor.suur_tuba_esp32_humidity
                   co2_entity: sensor.suur_tuba_esp32_co2
+                  presence_entity: binary_sensor.suure_toa_presence_sensor_occupancy
                   icon: mdi:sofa
                   light_entities:
                     - entity: light.suure_toa_soogilaua_tuled
@@ -920,6 +962,7 @@ views:
                   temp_entity: sensor.ag_one_temperature
                   humidity_entity: sensor.ag_one_humidity
                   co2_entity: sensor.ag_one_carbon_dioxide
+                  presence_entity: binary_sensor.pooningutuba_presence_sensor_occupancy
                   icon: mdi:home-roof
                   target_temp_entity: input_number.attic_target_temp
                   light_entities:
